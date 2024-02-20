@@ -1,0 +1,22 @@
+CREATE SCHEMA IF NOT EXISTS practica1;
+
+CREATE TABLE IF NOT EXISTS practica1.USER (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    user VARCHAR(100),
+    pass VARCHAR(100),
+    fullName VARCHAR(100)
+);
+
+CREATE TABLE IF NOT EXISTS practica1.ALBUM (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    albumName VARCHAR(100),
+    userId INT,
+    FOREIGN KEY (userId) REFERENCES practica1.USER(id)
+);
+
+CREATE TABLE IF NOT EXISTS practica1.IMAGE (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    photo VARCHAR(100),
+    albumId INT,
+    FOREIGN KEY (albumId) REFERENCES practica1.ALBUM(id)
+);

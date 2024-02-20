@@ -1,0 +1,86 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="26141E32-E406-9BDA-7BAC-4B5B7B1465C6" name="IMAGES">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:12:33 UTC</createdTime>
+<ownerDesignName>models</ownerDesignName>
+<engineerTo>
+<item key="4358C6B4-F745-B69F-EC10-7FF8FAB10BD1" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="id" id="6DBA1DA9-5A58-88D6-0805-A9B94BF5E7C2">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:12:44 UTC</createdTime>
+<ownerDesignName>models</ownerDesignName>
+<engineerTo>
+<item key="4358C6B4-F745-B69F-EC10-7FF8FAB10BD1" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="url" id="EBAF4BE7-DC37-E57B-C64A-C5CA675E1D65">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:12:54 UTC</createdTime>
+<ownerDesignName>models</ownerDesignName>
+<engineerTo>
+<item key="4358C6B4-F745-B69F-EC10-7FF8FAB10BD1" value="true"/>
+</engineerTo>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>80</dataTypeSize>
+<ownDataTypeParameters>80,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id1" id="C451DD81-282A-42B9-C7C8-8EEC96900DDE">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:14:07 UTC</createdTime>
+<generatorID>2D8D79FF-DFEB-F812-28CF-2EFCF6931445</generatorID>
+<ownerDesignName>models</ownerDesignName>
+<engineerTo>
+<item key="4358C6B4-F745-B69F-EC10-7FF8FAB10BD1" value="true"/>
+</engineerTo>
+<referedAttribute>5FAB3D7A-D38C-3233-CE75-5A118A04AB46</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="id11" id="9DF93D0A-F45F-51C8-77C6-8A33200AF020">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:14:07 UTC</createdTime>
+<generatorID>2D8D79FF-DFEB-F812-28CF-2EFCF6931445</generatorID>
+<ownerDesignName>models</ownerDesignName>
+<engineerTo>
+<item key="4358C6B4-F745-B69F-EC10-7FF8FAB10BD1" value="true"/>
+</engineerTo>
+<referedAttribute>D9E38C6D-759E-932D-F852-4BC9FD62C3C6</referedAttribute>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="EBBD3383-C01F-8164-9763-5814A3B1D8B2" name="IMAGES PK">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:12:47 UTC</createdTime>
+<ownerDesignName>models</ownerDesignName>
+<engineerTo>
+<item key="4358C6B4-F745-B69F-EC10-7FF8FAB10BD1" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>6DBA1DA9-5A58-88D6-0805-A9B94BF5E7C2</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

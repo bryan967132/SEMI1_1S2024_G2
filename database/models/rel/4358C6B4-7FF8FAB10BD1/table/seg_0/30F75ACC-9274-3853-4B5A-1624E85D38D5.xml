@@ -1,0 +1,76 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="30F75ACC-9274-3853-4B5A-1624E85D38D5" name="ALBUM">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:16:13 UTC</createdTime>
+<generatorID>0E08C1AB-77C9-D791-1575-5CE244B1E965</generatorID>
+<ownerDesignName>models</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="EAF0C077-2392-DCFC-3315-D60C6BC9CB8A">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:16:13 UTC</createdTime>
+<generatorID>5FAB3D7A-D38C-3233-CE75-5A118A04AB46</generatorID>
+<ownerDesignName>models</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="name" id="C42B6759-ED67-B77C-8811-47B8DEDC2210">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:16:13 UTC</createdTime>
+<generatorID>F84771B9-67EC-3390-F5AF-3E1E16D03D7B</generatorID>
+<ownerDesignName>models</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>80</dataTypeSize>
+<ownDataTypeParameters>80,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="USER_id" id="390D8453-ADAB-10ED-1768-A59BEB9D94BC">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:16:13 UTC</createdTime>
+<generatorID>D9E38C6D-759E-932D-F852-4BC9FD62C3C6</generatorID>
+<ownerDesignName>models</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT011</logicalDatatype>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<previousColumn>false</previousColumn>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="1FE7B628-CF62-FCFE-7B1B-21C2D39696AB" referredColumn="D77E1868-5DD9-D8F7-539A-4741091C9749"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="19CF288D-3BB4-3E17-1109-AEB12DE1013E" name="ALBUM_PK">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:16:13 UTC</createdTime>
+<generatorID>0B682A75-12AD-9DBE-BFEF-9D0A98B78A90</generatorID>
+<ownerDesignName>models</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="EAF0C077-2392-DCFC-3315-D60C6BC9CB8A"/>
+<colUsage columnID="390D8453-ADAB-10ED-1768-A59BEB9D94BC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C6216679-B1BD-47F6-A1E4-29F1F1D1381F" name="ALBUM_USER_FK">
+<createdBy>angge</createdBy>
+<createdTime>2024-02-20 23:16:13 UTC</createdTime>
+<generatorID>C6CECCCF-0773-3590-475A-B122305C71EB</generatorID>
+<ownerDesignName>models</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="390D8453-ADAB-10ED-1768-A59BEB9D94BC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

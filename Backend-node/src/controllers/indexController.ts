@@ -1,15 +1,14 @@
 import {Request, Response} from 'express';
 import pool from '../database'; // conexion base de datos
-import { error } from 'console';
+import { Encriptar } from '../utilidades';
 
 class IndexController{
 
     //POST: /login
     public async Login(req: Request, res: Response): Promise<void> {
         try {
-            const { usuario } = req.body;
-            const { contrasena } = req.body;
-            
+            const  usuario  = req.body.usuario;
+            const  contrasena  = Encriptar(req.body.contrasena);
             pool.query(
                 'SELECT u.*, i.photo FROM USER u LEFT JOIN ALBUM a ON u.id = a.userId LEFT JOIN IMAGE i ON a.id = i.albumId WHERE u.user = ? AND u.pass = ? ORDER BY i.id DESC LIMIT 1;',
                 [usuario,contrasena], (error, results) => {
@@ -54,7 +53,7 @@ class IndexController{
         try {
             const  usuario  = req.body.usuario;
             const  nombre  = req.body.nombre;
-            const  contrasena  = req.body.contrasena;
+            const  contrasena  = Encriptar(req.body.contrasena);
             const  foto  = req.body.foto; // tengo que subirla - aqui la recibo en base64
             const InsertUser = 'INSERT INTO USER (user, pass, fullName, activo) VALUES (?, ?, ?, ?);';
             const InsertAlbum = 'INSERT INTO ALBUM (albumName, userId) VALUES (?,?)';
@@ -117,7 +116,7 @@ class IndexController{
             const id_usuario = req.body.id_usuario;
             const usuario_nuevo = req.body.usuario_nuevo;
             const nombre = req.body.nombre;
-            const contrasena = req.body.contrasena;
+            const contrasena = Encriptar(req.body.contrasena);
             const foto = req.body.foto;
             const UpdateUser = 'UPDATE USER SET user = ?, pass = ?, fullName = ? WHERE id = ?';
             

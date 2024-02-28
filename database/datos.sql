@@ -1,26 +1,26 @@
 USE practica1;
 
-INSERT INTO USER (user, pass, fullName) VALUES
-('user1', 'pass123', 'John Smith'),
-('alice21', 'hello@321', 'Alice Johnson'),
-('johndoe', 'secret123', 'John Doe'),
-('sarah87', 'mypass456', 'Sarah Thompson'),
-('mike_34', 'ilovemydog', 'Mike Brown'),
-('emmaG', 'p@ssw0rd!', 'Emma Garcia'),
-('coolguy', 'letmein321', 'James Cool'),
-('lisa_m', 'passpass', 'Lisa Miller'),
-('tony99', 't0nyp@ss', 'Tony Anderson'),
-('rachel22', 'rachelRocks', 'Rachel Lee'),
-('sam123', 'samP@55', 'Sam Wright'),
-('sophie78', 'il0vesophie', 'Sophie Adams'),
-('max_cool', 'm@xRul3z', 'Max Cooper'),
-('user22', 'myp@ssword', 'Emily Brown'),
-('chris_23', 'chrisC0des', 'Chris Johnson'),
-('lily2000', 'l1ly!123', 'Lily Taylor'),
-('jack87', 'jackP@ss', 'Jack Evans'),
-('anna.m', 'ann@123', 'Anna Martinez'),
-('benjam1n', 'b3nny', 'Benjamin Wright'),
-('sophia1', 'sophia!123', 'Sophia Martinez');
+INSERT INTO USER (user, pass, fullName, activo) VALUES 
+('user1', 'pass123', 'John Smith', 0),
+('alice21', 'hello@321', 'Alice Johnson', 0),
+('johndoe', 'secret123', 'John Doe', 0),
+('sarah87', 'mypass456', 'Sarah Thompson', 0),
+('mike_34', 'ilovemydog', 'Mike Brown', 0),
+('emmaG', 'p@ssw0rd!', 'Emma Garcia', 0),
+('coolguy', 'letmein321', 'James Cool', 0),
+('lisa_m', 'passpass', 'Lisa Miller', 0),
+('tony99', 't0nyp@ss', 'Tony Anderson', 0),
+('rachel22', 'rachelRocks', 'Rachel Lee', 0),
+('sam123', 'samP@55', 'Sam Wright', 0),
+('sophie78', 'il0vesophie', 'Sophie Adams', 0),
+('max_cool', 'm@xRul3z', 'Max Cooper', 0),
+('user22', 'myp@ssword', 'Emily Brown', 0),
+('chris_23', 'chrisC0des', 'Chris Johnson', 0),
+('lily2000', 'l1ly!123', 'Lily Taylor', 0),
+('jack87', 'jackP@ss', 'Jack Evans', 0),
+('anna.m', 'ann@123', 'Anna Martinez', 0),
+('benjam1n', 'b3nny', 'Benjamin Wright', 0),
+('sophia1', 'sophia!123', 'Sophia Martinez', 0);
 
 INSERT INTO ALBUM (albumName, userId) VALUES
 ('Foto de perfil', 1),

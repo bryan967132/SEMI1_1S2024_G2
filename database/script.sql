@@ -2,21 +2,22 @@ CREATE SCHEMA IF NOT EXISTS practica1;
 
 CREATE TABLE IF NOT EXISTS practica1.USER (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    user VARCHAR(100),
-    pass VARCHAR(100),
-    fullName VARCHAR(100)
+    user VARCHAR(100) NOT NULL,
+    pass VARCHAR(100) NOT NULL,
+    fullName VARCHAR(100) NOT NULL,
+    activo BOOLEAN NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS practica1.ALBUM (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    albumName VARCHAR(100),
-    userId INT,
+    albumName VARCHAR(100) NOT NULL,
+    userId INT NOT NULL,
     FOREIGN KEY (userId) REFERENCES practica1.USER(id)
 );
 
 CREATE TABLE IF NOT EXISTS practica1.IMAGE (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    photo VARCHAR(100),
-    albumId INT,
+    photo VARCHAR(100) NOT NULL,
+    albumId INT NOT NULL,
     FOREIGN KEY (albumId) REFERENCES practica1.ALBUM(id)
 );

@@ -1,11 +1,18 @@
-import mysql, { PoolConnection } from 'mysql';
-import keys from './keys';
+import * as mysql from 'mysql';
+import dotenv from 'dotenv';
+import path from 'path';
 
-// Configuración de la conexión
-const pool = mysql.createPool(keys.database);
+const envPath = path.resolve(__dirname, '..', '.env');
+dotenv.config({ path: envPath });
 
-// Obtener una conexión del pool
-pool.getConnection((err: mysql.MysqlError, connection: PoolConnection | undefined) => {
+const pool = mysql.createPool({
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  database: process.env.DATABASE
+});
+
+pool.getConnection((err, connection) => {
   if (err) {
     console.error('Error al conectar a la base de datos:', err.message);
     return;

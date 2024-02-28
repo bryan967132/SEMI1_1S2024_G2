@@ -10,7 +10,18 @@ class IndexRoutes{
     }
 
     config(): void {
-        this.router.get('/', indexController.index)
+        this.router.post('/login', indexController.Login)
+        this.router.post('/logout', indexController.CerrarSesion)
+        this.router.post('/signin', indexController.Registrar)
+        this.router.get('/home', indexController.Home)
+        this.router.put('/edituser', indexController.EditarUsuario)
+        this.router.post('/uploadphoto', indexController.SubirFoto)
+        this.router.post('/newalbum', indexController.NuevoAlbum)
+        this.router.put('/editalbum', indexController.EditarAlbum)
+        this.router.delete('/deletealbum', indexController.EliminarAlbum)
+        this.router.get('/getalbumname', indexController.GetAlbums)
+        this.router.get('/getalbumes', indexController.GetAlbumsFoto)
+        //this.router.get('/getusuario', indexController.GetUsuario)
     }
 
     

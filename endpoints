@@ -1,0 +1,132 @@
+LOGIN
+
+POST: /login
+- Body
+{
+    "usuario": "usuario",
+    "contrasena": "usuario"
+}
+- Response
+Todos los atributos de usuario
+
+CERRAR SESION
+POST: /logout
+- Body
+{
+    "usuario": "usuario",
+}
+- Response
+{
+    "mensaje": "texto"
+}
+
+REGISTRO
+POST: /signin
+- Body
+{
+    "usuario": "usuario",
+    "nombre": "nombre_completo",
+    "contrasena": "usuario",
+    "foto": "base64"
+}
+- Response
+{
+    "mensaje": "texto"
+}
+
+PÁGINA DE INICIO
+GET: /home
+- Body
+- Response
+Todos los atributos de usuario (incluir imagen de perfil)
+
+EDITAR PERFIL
+GET: /home
+- Body
+- Response
+Todos los atributos de usuario (incluir imagen de perfil)
+
+EDITAR (BOTON)
+UPDATE: /edituser
+- Body
+{
+    "id_usuario": id,
+    "usuario_nuevo": "usuario",
+    "nombre": "nombre_completo",
+    "contrasena": "usuario",
+    "foto": "base64"
+}
+- Response
+{
+    "mensaje": "texto"
+}
+
+SUBIR FOTO
+POST: /uploadphoto
+- Body
+{
+    "usuario": "usuario",
+    "nombre_foto": "nombre",
+    "nombre_album": "album",
+    "foto": "base64"
+}
+- Response
+{
+    "mensaje": "texto"
+}
+
+EDITAR ÁLBUMES
+POST: /newalbum
+- Body
+{
+    "usuario": "usuario",
+    "nombre_album": "album"
+}
+- Response
+{
+    "mensaje": "texto"
+}
+
+UPDATE: /editalbum
+- Body
+{
+    "id_usuario": "id_usuario",
+    "id_album": id,
+    "nombre_album_nuevo": "album"
+}
+- Response
+{
+    "mensaje": "texto"
+}
+
+DELETE: /deletealbum
+- Body
+{
+    "usuario": "usuario",
+    "nombre_album": "album"
+}
+- Response
+{
+    "mensaje": "texto"
+}
+
+GET (Para select de albumes): /getalbumname
+- Body
+{
+    "usuario": "usuario"
+}
+- Response (Solo nombres)
+{
+    "albumes": [...listado de nombres...]
+}
+
+VER FOTOS
+GET: /getalbumes
+- Body
+{
+    "usuario": "usuario"
+}
+- Response (Incluir cada foto de cada album del usuario)
+{
+    "albumes": [...listado de nombres...]
+}

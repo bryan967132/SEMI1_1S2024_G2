@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "aws-sdk": "^2.1568.0",
     "crypto-js": "^4.2.0"
   },
   "devDependencies": {

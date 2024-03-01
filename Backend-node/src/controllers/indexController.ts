@@ -225,50 +225,47 @@ class IndexController{
 
 
     //DELETE: /deletealbum
-    public async EliminarAlbum(req: Request, res: Response):Promise<void>{
+    public async EliminarAlbum(req: Request, res: Response): Promise<void> {
         try{
             const usuario = req.body.usuario;
             const nombre_album = req.body.nombre_album;
-            const EliminarFotos = `
-            DELETE FROM IMAGE 
-            WHERE albumId IN (SELECT id FROM ALBUM WHERE userId = (SELECT id FROM USER WHERE user = ?) AND albumName = ?);
-            `;
-
-            const EliminarAlbum = `
-                DELETE FROM ALBUM 
-                WHERE albumName = ? AND userId = (SELECT id FROM USER WHERE user = ?); 
-            `;
-
-        pool.query(
-            EliminarFotos,
-            [usuario, nombre_album],
-            (error) => { 
+            const ObtenerImagenes = `SELECT id FROM IMAGE WHERE albumId IN (SELECT id FROM ALBUM WHERE userId = (SELECT id FROM USER WHERE user = ?) AND albumName = ?);`;
+            const EliminarImagen = `DELETE FROM IMAGE WHERE id = ?;`;
+            const EliminarAlbum = `DELETE FROM ALBUM WHERE albumName = ? AND userId = (SELECT id FROM USER WHERE user = ?); `;
+    
+            pool.query(ObtenerImagenes, [usuario, nombre_album], async (error, resultados) => {
                 if (error) {
-                    console.log(error)
-                    res.status(500).json({ mensaje: 'Error al eliminar las fotos del album' });
+                    console.log(error);
+                    res.status(500).json({ mensaje: 'Error al obtener las imágenes del álbum' });
                     return;
                 }
-
-                pool.query(
-                    EliminarAlbum,
-                    [nombre_album, usuario],
-                    (error) => { 
-                        if (error) {
-                            console.log(error)
-                            res.status(500).json({ mensaje: 'Error al eliminar el album' });
-                            return;
-                        }
-                        
-                        res.json({mensaje: 'Album eliminado exitosamente'});    
+                for (const imagen of resultados) {
+                    await new Promise((resolve, reject) => {
+                        pool.query(EliminarImagen, [imagen.id], (error) => {
+                            if (error) {
+                                console.log(error);
+                                reject(error);
+                            } else {
+                                resolve();
+                            }
+                        });
+                    });
+                }
+                pool.query(EliminarAlbum, [nombre_album, usuario], (error) => {
+                    if (error) {
+                        console.log(error);
+                        res.status(500).json({ mensaje: 'Error al eliminar el álbum' });
+                    } else {
+                        res.json({ mensaje: 'Álbum eliminado exitosamente' });
                     }
-                );
-            }
-        );
-
+                });
+            });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error al eliminar el album' });
+            console.log(error);
+            res.status(500).json({ mensaje: 'Error al eliminar el álbum' });
         }
     }
+    
 
     //GET /getalbumname - (Para select de albumes):
     public async GetAlbums(req: Request, res: Response): Promise<void> {

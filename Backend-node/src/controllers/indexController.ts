@@ -1,15 +1,19 @@
 import {Request, Response} from 'express';
 import pool from '../database'; // conexion base de datos
-import { error } from 'console';
+import { Encriptar,SubirImagenPublicada,SubirImagenPerfil } from '../utilidades';
+import dotenv from 'dotenv';
+import path from 'path';
+
+const envPath = path.resolve(__dirname, '..', '.env');
+dotenv.config({ path: envPath });
 
 class IndexController{
 
     //POST: /login
     public async Login(req: Request, res: Response): Promise<void> {
         try {
-            const { usuario } = req.body;
-            const { contrasena } = req.body;
-            
+            const  usuario  = req.body.usuario;
+            const  contrasena  = Encriptar(req.body.contrasena);
             pool.query(
                 'SELECT u.*, i.photo FROM USER u LEFT JOIN ALBUM a ON u.id = a.userId LEFT JOIN IMAGE i ON a.id = i.albumId WHERE u.user = ? AND u.pass = ? ORDER BY i.id DESC LIMIT 1;',
                 [usuario,contrasena], (error, results) => {
@@ -18,6 +22,7 @@ class IndexController{
                         'UPDATE USER SET activo = 1 WHERE user = ? AND pass = ?;',
                         [usuario,contrasena]
                         );
+                    results[0].photo=process.env.RUTA+results[0].photo;
                     res.json(results[0]);
                 }else {
                     res.status(401).json({ mensaje: 'Usuario o Contraseña Incorrectos' }); 
@@ -54,12 +59,12 @@ class IndexController{
         try {
             const  usuario  = req.body.usuario;
             const  nombre  = req.body.nombre;
-            const  contrasena  = req.body.contrasena;
+            const  contrasena  = Encriptar(req.body.contrasena);
             const  foto  = req.body.foto; // tengo que subirla - aqui la recibo en base64
             const InsertUser = 'INSERT INTO USER (user, pass, fullName, activo) VALUES (?, ?, ?, ?);';
             const InsertAlbum = 'INSERT INTO ALBUM (albumName, userId) VALUES (?,?)';
             const InsertImage = 'INSERT INTO IMAGE (photo, albumId) VALUES (?, ?);';
-            
+            const url=SubirImagenPerfil(foto,"foto1");
             pool.query( //insert user
                 InsertUser, 
                 [usuario,contrasena,nombre,0], (error,userResult) => {
@@ -80,7 +85,7 @@ class IndexController{
 
                             pool.query( //insert foto de perfil
                                 InsertImage, 
-                                ['Fotos_Perfil/nueva_foto.jpg',albumId], (error) => {
+                                [url,albumId], (error) => {
                                     if (error){
                                         res.status(500).json({ mensaje: 'Error en el proceso de registro de usuario' });
                                         return
@@ -101,6 +106,7 @@ class IndexController{
                 'SELECT u.*, i.photo FROM USER u LEFT JOIN ALBUM a ON u.id = a.userId LEFT JOIN IMAGE i ON a.id = i.albumId WHERE u.activo = 1 ORDER BY i.id DESC LIMIT 1;',
                 (error, results) => {
                 if (results && results.length > 0) {
+                    results[0].photo=process.env.RUTA+results[0].photo;
                     res.json(results);
                 } else {
                     res.json({ mensaje: "Error: No se encontro el usuario" });
@@ -117,10 +123,22 @@ class IndexController{
             const id_usuario = req.body.id_usuario;
             const usuario_nuevo = req.body.usuario_nuevo;
             const nombre = req.body.nombre;
-            const contrasena = req.body.contrasena;
+            const contrasena = Encriptar(req.body.contrasena);
             const foto = req.body.foto;
             const UpdateUser = 'UPDATE USER SET user = ?, pass = ?, fullName = ? WHERE id = ?';
-            
+            var nombre_foto,url;
+            pool.query( 
+                "SELECT count(i.id) AS ultimo_id FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id WHERE a.userId = 23 AND a.albumName = 'Fotos de perfil';",
+                [id_usuario,"Fotos de perfil"],(errom,rcont)=>{
+                    nombre_foto=usuario_nuevo+"-foto"+(rcont[0].ultimo_id + 1)
+                    console.log(nombre_foto);
+                    url=SubirImagenPerfil(foto,nombre_foto)
+                //insertar la nueva foto
+                pool.query( 
+                    "INSERT INTO IMAGE (photo, albumId) SELECT ?, a.id FROM ALBUM a INNER JOIN USER u ON a.userId = u.id WHERE u.id = ? AND a.albumName = ?;",
+                    [url,id_usuario,"Fotos de perfil"]
+                );
+            });
             pool.query(
                 UpdateUser,
                 [usuario_nuevo,contrasena,nombre,id_usuario],
@@ -142,12 +160,12 @@ class IndexController{
             const usuario = req.body.usuario;
             const nombre_foto = req.body.nombre_foto;
             const nombre_album = req.body.nombre_album;
-            const foto = req.body.foto; // la recibo en base64 
-            const InsertFoto = '';
-            
+            const foto = req.body.foto; //la recibo en base64 
+            const InsertFoto = 'INSERT INTO IMAGE (photo, albumId) SELECT ?, a.id FROM ALBUM a INNER JOIN USER u ON a.userId = u.id WHERE u.user = ? AND a.albumName = ?;';
+            const url=SubirImagenPublicada(foto,nombre_foto);
             pool.query(
                 InsertFoto,
-                [],
+                [url,usuario,nombre_album],
                 (error) => { 
                     if (error) {
                         res.status(500).json({ mensaje: 'Error al insertar la foto' });
@@ -207,26 +225,47 @@ class IndexController{
 
 
     //DELETE: /deletealbum
-    public async EliminarAlbum(req: Request, res: Response):Promise<void>{
+    public async EliminarAlbum(req: Request, res: Response): Promise<void> {
         try{
             const usuario = req.body.usuario;
             const nombre_album = req.body.nombre_album;
-            const EliminarAlbum = 'DELETE a FROM ALBUM a INNER JOIN USER u ON a.userId = u.id  WHERE u.user = ? AND a.albumName = ?;';
-
-            pool.query(
-                EliminarAlbum,
-                [usuario,nombre_album],
-                (error) => { 
+            const ObtenerImagenes = `SELECT id FROM IMAGE WHERE albumId IN (SELECT id FROM ALBUM WHERE userId = (SELECT id FROM USER WHERE user = ?) AND albumName = ?);`;
+            const EliminarImagen = `DELETE FROM IMAGE WHERE id = ?;`;
+            const EliminarAlbum = `DELETE FROM ALBUM WHERE albumName = ? AND userId = (SELECT id FROM USER WHERE user = ?); `;
+    
+            pool.query(ObtenerImagenes, [usuario, nombre_album], async (error, resultados) => {
+                if (error) {
+                    console.log(error);
+                    res.status(500).json({ mensaje: 'Error al obtener las imágenes del álbum' });
+                    return;
+                }
+                for (const imagen of resultados) {
+                    await new Promise((resolve, reject) => {
+                        pool.query(EliminarImagen, [imagen.id], (error) => {
+                            if (error) {
+                                console.log(error);
+                                reject(error);
+                            } else {
+                                resolve();
+                            }
+                        });
+                    });
+                }
+                pool.query(EliminarAlbum, [nombre_album, usuario], (error) => {
                     if (error) {
-                        res.status(500).json({ mensaje: 'Error al eliminar el album' });
-                        return
+                        console.log(error);
+                        res.status(500).json({ mensaje: 'Error al eliminar el álbum' });
+                    } else {
+                        res.json({ mensaje: 'Álbum eliminado exitosamente' });
                     }
-                    res.json({mensaje: 'Album eliminado exitosamente'});    
                 });
+            });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error al eliminar el album' });
+            console.log(error);
+            res.status(500).json({ mensaje: 'Error al eliminar el álbum' });
         }
     }
+    
 
     //GET /getalbumname - (Para select de albumes):
     public async GetAlbums(req: Request, res: Response): Promise<void> {
@@ -279,9 +318,9 @@ class IndexController{
 
     public async GetUsuario(req: Request, res: Response): Promise<void> {
         try {
-            pool.query('SELECT * FROM USER', (error, results) => {
+            pool.query('SELECT * FROM IMAGE WHERE albumId=21', (error, results) => {
                 if (results && results.length > 0) {
-                    res.json({"albumes": results});
+                    res.json(results);
                 } else {
                     res.json({ mensaje: "No se encontraron usuarios" });
                 }

@@ -1,6 +1,7 @@
 import express,{ Application } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 
 import indexRoutes from './routes/indexRoutes';
 
@@ -15,10 +16,10 @@ class Server {
     }
 
     config():void {
-        this.app.set('port', process.env.PORT ||4000)
+        this.app.set('port', process.env.PORT || 4000)
         this.app.use(morgan('dev'))
         this.app.use(cors());
-        this.app.use(express.json()); 
+        this.app.use(express.json({limit:"50mb"})); 
         this.app.use(express.urlencoded({extended: false}));
     }
     // Rutas del servidor

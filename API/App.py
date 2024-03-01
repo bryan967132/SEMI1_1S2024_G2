@@ -31,10 +31,9 @@ def signin():
     return ctrlr.signin(body["usuario"], body["nombre"], body["contrasena"], body["foto"])
 
 # PÁGINA DE INICIO | EDITAR PERFIL (PARA VISUALIZAR INFORMACIÓN)
-@app.route('/home', methods=['GET'])
-def home():
-    body = request.json
-    return ctrlr.home(body["usuario"])
+@app.route('/home/<usuario>', methods=['GET'])
+def home(usuario):
+    return ctrlr.home(usuario)
 
 # EDITAR PERFIL (BOTÓN)
 @app.route('/edituser', methods=['PUT'])
@@ -54,7 +53,13 @@ def getalbumes():
     body = request.json
     return ctrlr.getalbumes(body["usuario"])
 
-# VER FOTOS
+# VER FOTOS POR ALBUM
+@app.route('/getalbumesfotos', methods=["GET"])
+def getalbumesfotos():
+    body = request.json
+    return ctrlr.getalbumesfotos(body["usuario"], body["album"])
+
+# CARGAR FOTOS
 @app.route('/uploadphoto', methods=["POST"])
 def uploadphoto():
     body = request.json

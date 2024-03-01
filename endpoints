@@ -132,22 +132,16 @@ DELETE: /deletealbum
     "mensaje": "texto"
 }
 
-GET (Para select de albumes): /getalbumname
+GET (Para select de albumes): /getalbumname/<usuario>
 - Body
-{
-    "usuario": "usuario"
-}
 - Response (Solo nombres)
 {
     "albumes": []
 }
 
 VER FOTOS
-GET: /getalbumes
+GET: /getalbumes/<usuario>
 - Body
-{
-    "usuario": "usuario"
-}
 - Response (Incluir cada foto de cada album del usuario)
 {
     "albumes": [
@@ -163,12 +157,8 @@ GET: /getalbumes
 }
 
 VER FOTOS POR ALBUM
-GET: /getalbumesfotos
+GET: /getalbumesfotos/<usuario>/<nombre_album>
 - Body
-{
-    "usuario": "usuario",
-    "album": "album"
-}
 - Response (Incluir cada foto de cada album del usuario)
 {
     "fotos": []

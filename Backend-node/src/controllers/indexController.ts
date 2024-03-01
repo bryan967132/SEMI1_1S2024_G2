@@ -23,13 +23,16 @@ class IndexController{
                         [usuario,contrasena]
                         );
                     results[0].photo=process.env.RUTA+results[0].photo;
+                    results[0].mensaje="Se inicio sesion"
                     res.json(results[0]);
                 }else {
-                    res.status(401).json({ mensaje: 'Usuario o Contraseña Incorrectos' }); 
+                    //res.status(401).json({ mensaje: 'Usuario o Contraseña Incorrectos' }); 
+                    res.json({ mensaje: "Error" });
                 }
             });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error en el proceso de inicio de sesión' });
+            //res.status(500).json({ mensaje: 'Error en el proceso de inicio de sesión' });
+            res.json({ mensaje: "Error" });
         }
     }
 
@@ -44,13 +47,15 @@ class IndexController{
                 [usuario],
                 (error) => { 
                     if (error) {
-                        res.status(500).json({ mensaje: 'Error al actulizar el usuario' });
+                        //res.status(500).json({ mensaje: 'Error cerrar sesion' });
+                        res.json({ mensaje: "Error" });
                         return
                     }
-                    res.json({mensaje: 'Usuario Actualizado'});    
+                    res.json({mensaje: 'Se cerro sesion con exito'});    
                 });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error al actualizar el usuario' });
+            //res.status(500).json({ mensaje: 'Error al cerrar sesion' });
+            res.json({ mensaje: "Error" });
         }
     }
     
@@ -60,7 +65,7 @@ class IndexController{
             const  usuario  = req.body.usuario;
             const  nombre  = req.body.nombre;
             const  contrasena  = Encriptar(req.body.contrasena);
-            const  foto  = req.body.foto; // tengo que subirla - aqui la recibo en base64
+            const  foto  = req.body.foto; 
             const InsertUser = 'INSERT INTO USER (user, pass, fullName, activo) VALUES (?, ?, ?, ?);';
             const InsertAlbum = 'INSERT INTO ALBUM (albumName, userId) VALUES (?,?)';
             const InsertImage = 'INSERT INTO IMAGE (photo, albumId) VALUES (?, ?);';
@@ -69,16 +74,18 @@ class IndexController{
                 InsertUser, 
                 [usuario,contrasena,nombre,0], (error,userResult) => {
                     if (error){
-                        res.status(500).json({ mensaje: 'Error en el proceso de registro de usuario' });
+                        //res.status(500).json({ mensaje: 'Error en el proceso de registro de usuario' });
+                        res.json({ mensaje: "Error" });
                         return
                     }
                     const userId = userResult.insertId;
 
                     pool.query( //insert album
                         InsertAlbum, 
-                        ['Fotos de perfil',userId], (error,albumResult) => {
+                        ['Foto de perfil',userId], (error,albumResult) => {
                             if (error){
-                                res.status(500).json({ mensaje: 'Error en el proceso de registro de usuario' });
+                                //res.status(500).json({ mensaje: 'Error en el proceso de registro de usuario' });
+                                res.json({ mensaje: "Error" });
                                 return
                             }
                             const albumId = albumResult.insertId;
@@ -87,7 +94,8 @@ class IndexController{
                                 InsertImage, 
                                 [url,albumId], (error) => {
                                     if (error){
-                                        res.status(500).json({ mensaje: 'Error en el proceso de registro de usuario' });
+                                        //res.status(500).json({ mensaje: 'Error en el proceso de registro de usuario' });
+                                        res.json({ mensaje: "Error" });
                                         return
                                     }
                             }); 
@@ -95,25 +103,30 @@ class IndexController{
                     res.json({ mensaje: 'Usuario Creado' })
             });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error en el proceso de registro de usuario' });
+            //res.status(500).json({ mensaje: 'Error en el proceso de registro de usuario' });
+            res.json({ mensaje: "Error" });
         }
     }
 
     //GET: /home
     public async Home(req: Request, res: Response): Promise<void> {
         try {
+            const  usuario  = req.params.usuario;
             pool.query(
-                'SELECT u.*, i.photo FROM USER u LEFT JOIN ALBUM a ON u.id = a.userId LEFT JOIN IMAGE i ON a.id = i.albumId WHERE u.activo = 1 ORDER BY i.id DESC LIMIT 1;',
-                (error, results) => {
+                'SELECT u.*, i.photo FROM USER u LEFT JOIN ALBUM a ON u.id = a.userId LEFT JOIN IMAGE i ON a.id = i.albumId WHERE u.user = ? ORDER BY i.id DESC LIMIT 1;',
+                [usuario],(error, results) => {
                 if (results && results.length > 0) {
                     results[0].photo=process.env.RUTA+results[0].photo;
-                    res.json(results);
+                    results[0].mensaje="Se obtuvo los datos del usuario"
+                    res.json(results[0]);
                 } else {
-                    res.json({ mensaje: "Error: No se encontro el usuario" });
+                    //res.json({ mensaje: "Error: No se encontro el usuario" });
+                    res.json({ mensaje: "Error" });
                 }
             });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error al obtener usuarios' });
+            //res.status(500).json({ mensaje: 'Error al obtener usuarios' });
+            res.json({ mensaje: "Error" });
         }
     }
 
@@ -128,8 +141,8 @@ class IndexController{
             const UpdateUser = 'UPDATE USER SET user = ?, pass = ?, fullName = ? WHERE id = ?';
             var nombre_foto,url;
             pool.query( 
-                "SELECT count(i.id) AS ultimo_id FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id WHERE a.userId = 23 AND a.albumName = 'Fotos de perfil';",
-                [id_usuario,"Fotos de perfil"],(errom,rcont)=>{
+                "SELECT count(i.id) AS ultimo_id FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id WHERE a.userId = 23 AND a.albumName = 'Foto de perfil';",
+                [id_usuario,"Foto de perfil"],(errom,rcont)=>{
                     nombre_foto=usuario_nuevo+"-foto"+(rcont[0].ultimo_id + 1)
                     console.log(nombre_foto);
                     url=SubirImagenPerfil(foto,nombre_foto)
@@ -144,13 +157,15 @@ class IndexController{
                 [usuario_nuevo,contrasena,nombre,id_usuario],
                 (error) => { 
                     if (error) {
-                        res.status(500).json({ mensaje: 'Error al actulizar el usuario' });
+                        //res.status(500).json({ mensaje: 'Error al actulizar el usuario' });
+                        res.json({ mensaje: "Error" });
                         return
                     }
-                    res.json({mensaje: 'Usuario Actualizado'});    
+                    res.json({mensaje: 'Usuario Actualizado'});
                 });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error al actualizar el usuario' });
+            //res.status(500).json({ mensaje: 'Error al actualizar el usuario' });
+            res.json({ mensaje: "Error" });
         }
     }
 
@@ -168,35 +183,39 @@ class IndexController{
                 [url,usuario,nombre_album],
                 (error) => { 
                     if (error) {
-                        res.status(500).json({ mensaje: 'Error al insertar la foto' });
+                        //res.status(500).json({ mensaje: 'Error al insertar la foto' });
+                        res.json({ mensaje: "Error" });
                         return
                     }
                     res.json({mensaje: 'Foto insertada'});    
                 });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error al actualizar el usuario' });
+            //res.status(500).json({ mensaje: 'Error al actualizar el usuario' });
+            res.json({ mensaje: "Error" });
         }
     }
 
-    //POST: /newalbum
+    //POST: /newalbum   
     public async NuevoAlbum(req: Request, res: Response):Promise<void>{
         try{
             const usuario = req.body.usuario;
             const nombre_album = req.body.nombre_album;
-            const NuevoAlbum = 'INSERT INTO ALBUM (albumName, userId) SELECT ?, id FROM USER WHERE user = ?;';
+            const NuevoAlbum = 'INSERT INTO ALBUM (userId, albumName) VALUES ((SELECT id FROM USER WHERE user = ?), ?)';
             
             pool.query(
                 NuevoAlbum,
-                [nombre_album,usuario],
+                [usuario,nombre_album],
                 (error) => { 
                     if (error) {
-                        res.status(500).json({ mensaje: 'Error al crear un nuevo album' });
+                        //res.status(500).json({ mensaje: 'Error al crear un nuevo album' });
+                        res.json({ mensaje: "Error" });
                         return
                     }
                     res.json({mensaje: 'Album creado exitosamente'});    
                 });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error al crear un nuevo album' });
+            //res.status(500).json({ mensaje: 'Error al crear un nuevo album' });
+            res.json({ mensaje: "Error" });
         }
     }
 
@@ -213,13 +232,15 @@ class IndexController{
                 [nombre_album_nuevo,id_usuario,id_album],
                 (error) => { 
                     if (error) {
-                        res.status(500).json({ mensaje: 'Error al editar el album' });
+                        //res.status(500).json({ mensaje: 'Error al editar el album' });
+                        res.json({ mensaje: "Error" });
                         return
                     }
                     res.json({mensaje: 'Album editado exitosamente'});    
                 });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error al editar el album' });
+            //res.status(500).json({ mensaje: 'Error al editar el album' });
+            res.json({ mensaje: "Error" });
         }
     }
 
@@ -236,14 +257,14 @@ class IndexController{
             pool.query(ObtenerImagenes, [usuario, nombre_album], async (error, resultados) => {
                 if (error) {
                     console.log(error);
-                    res.status(500).json({ mensaje: 'Error al obtener las imágenes del álbum' });
+                    //res.status(500).json({ mensaje: 'Error al obtener las imágenes del álbum' });
+                    res.json({ mensaje: "Error" });
                     return;
                 }
                 for (const imagen of resultados) {
                     await new Promise((resolve, reject) => {
                         pool.query(EliminarImagen, [imagen.id], (error) => {
                             if (error) {
-                                console.log(error);
                                 reject(error);
                             } else {
                                 resolve();
@@ -253,16 +274,16 @@ class IndexController{
                 }
                 pool.query(EliminarAlbum, [nombre_album, usuario], (error) => {
                     if (error) {
-                        console.log(error);
-                        res.status(500).json({ mensaje: 'Error al eliminar el álbum' });
+                        //res.status(500).json({ mensaje: 'Error al eliminar el álbum' });
+                        res.json({ mensaje: "Error" });
                     } else {
                         res.json({ mensaje: 'Álbum eliminado exitosamente' });
                     }
                 });
             });
         } catch (error) {
-            console.log(error);
-            res.status(500).json({ mensaje: 'Error al eliminar el álbum' });
+            //res.status(500).json({ mensaje: 'Error al eliminar el álbum' });
+            res.json({ mensaje: "Error" });
         }
     }
     
@@ -277,13 +298,25 @@ class IndexController{
                 'SELECT a.* FROM ALBUM a INNER JOIN USER u ON a.userId = u.id  WHERE u.user = ?;',
                 [usuario],(error, results) => {
                     if (error) {
-                        res.status(500).json({ mensaje: 'Error al obtener los albums' });
+                        //res.status(500).json({ mensaje: 'Error al obtener los albums' });
+                        res.json({ mensaje: "Error" });
                         return
                     }
                     if (results && results.length > 0) {
-                        res.json(results);
+                        
+                        const albums = [];
+                        results.forEach((row) => {
+                            albums.push(row.albumName);
+                        });
+                        const datosReturn = {
+                            "fotos": albums,
+                            "mensaje":"Se obtuvo los albumnes del usuario "
+                        };
+                        res.json(datosReturn);
+                        
                     } else {
-                        res.json({ mensaje: "No se encontraron albums" });
+                        //res.json({ mensaje: "No se encontraron albums" });
+                        res.json({ mensaje: "Error" });
                     }
             });
         } catch (error) {
@@ -296,25 +329,64 @@ class IndexController{
         try {
             const usuario = req.body.usuario;
 
-
             pool.query(
                 'SELECT a.albumName, i.photo FROM ALBUM a INNER JOIN USER u ON a.userId = u.id LEFT JOIN IMAGE i ON a.id = i.albumId WHERE u.user = ?;',
                 [usuario],(error, results) => {
                     if (error) {
-                        res.status(500).json({ mensaje: 'Error al obtener los albums' });
+                        //res.status(500).json({ mensaje: 'Error al obtener los albums' });
+                        res.json({ mensaje: "Error" });
                         return
                     }
                     if (results && results.length > 0) {
+                        
                         res.json({"albumes": results});
                     } else {
-                        res.json({ mensaje: "No se encontraron albums" });
+                        //res.json({ mensaje: "No se encontraron albums" });
+                        res.json({ mensaje: "Error" });
                     }
             });
         } catch (error) {
-            res.status(500).json({ mensaje: 'Error al obtener usuarios' });
+            res.status(500).json({ mensaje: 'Error' });
         }
     }
 
+     //GET: /getalbumesfotos
+     public async GetAlbumesFotos(req: Request, res: Response): Promise<void> {
+        try {
+            const usuario = req.body.usuario;
+            const album = req.body.album;
+
+            pool.query(
+                'SELECT i.* FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id INNER JOIN USER u ON a.userId = u.id WHERE u.user = ? AND a.albumName = ?;',
+                [usuario,album],(error, results) => {
+                    if (error) {
+                        //res.status(500).json({ mensaje: 'Error al obtener los albums' });
+                        res.json({ mensaje: "Error" });
+                        return
+                    }
+                    if (results && results.length > 0) {
+                        const fotos = [];
+                        results.forEach((row) => {
+                            fotos.push(row.photo);
+                        });
+
+                        const datosReturn = {
+                            "fotos": fotos,
+                            "mensaje":"Se obtuvo las imagenes del album "
+                        };
+                        res.json(datosReturn);
+                        
+
+                    } else {
+                        //res.json({ mensaje: "No se encontraron albums" });
+                        res.json({ mensaje: "Error" });
+                    }
+            });
+        } catch (error) {
+            //res.status(500).json({ mensaje: 'Error al obtener usuarios' });
+            res.status(500).json({ mensaje: 'Error' });
+        }
+    }
 
     public async GetUsuario(req: Request, res: Response): Promise<void> {
         try {

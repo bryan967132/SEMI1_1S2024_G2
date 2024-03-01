@@ -7,13 +7,21 @@ POST: /login
     "contrasena": "usuario"
 }
 - Response
-Todos los atributos de usuario
+{
+  "activo": 1,
+  "contrasena": "123",
+  "id": 21,
+  "mensaje": "Bienvenido",
+  "nombre_completo": "Bases 1",
+  "usuario": "DB1EDITADO"
+}
 
-CERRAR SESION
+LOGOUT
 POST: /logout
 - Body
 {
     "usuario": "usuario",
+    "contrasena": "usuario"
 }
 - Response
 {
@@ -38,13 +46,27 @@ PÁGINA DE INICIO
 GET: /home
 - Body
 - Response
-Todos los atributos de usuario (incluir imagen de perfil)
+{
+  "activo": 1,
+  "contrasena": "123",
+  "foto": "Fotos_Perfil/foto22.jpg",
+  "id": 21,
+  "nombre_completo": "Bases 1",
+  "usuario": "DB1EDITADO"
+}
 
 EDITAR PERFIL
 GET: /home
 - Body
 - Response
-Todos los atributos de usuario (incluir imagen de perfil)
+{
+  "activo": 1,
+  "contrasena": "123",
+  "foto": "Fotos_Perfil/foto22.jpg",
+  "id": 21,
+  "nombre_completo": "Bases 1",
+  "usuario": "DB1EDITADO"
+}
 
 EDITAR (BOTON)
 UPDATE: /edituser
@@ -90,7 +112,7 @@ POST: /newalbum
 UPDATE: /editalbum
 - Body
 {
-    "id_usuario": "id_usuario",
+    "usuario": "usuario",
     "id_album": id,
     "nombre_album_nuevo": "album"
 }
@@ -117,7 +139,7 @@ GET (Para select de albumes): /getalbumname
 }
 - Response (Solo nombres)
 {
-    "albumes": [...listado de nombres...]
+    "albumes": []
 }
 
 VER FOTOS
@@ -128,5 +150,26 @@ GET: /getalbumes
 }
 - Response (Incluir cada foto de cada album del usuario)
 {
-    "albumes": [...listado de nombres...]
+  "albumes": [
+    {
+        "nombre": "Foto de perfil",
+        "fotos": []
+    },
+    {
+        "nombre": "Mascotas de la familia",
+        "fotos": []
+    }
+  ]
+}
+
+VER FOTOS POR ALBUM
+GET: /getalbumesfotos
+- Body
+{
+    "usuario": "usuario",
+    "album": "album"
+}
+- Response (Incluir cada foto de cada album del usuario)
+{
+    "fotos": ["", ""]
 }

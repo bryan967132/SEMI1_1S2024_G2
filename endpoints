@@ -43,29 +43,29 @@ POST: /signin
 }
 
 PÁGINA DE INICIO
-GET: /home
+GET: /home/<usuario>
 - Body
 - Response
 {
-  "activo": 1,
-  "contrasena": "123",
-  "foto": "Fotos_Perfil/foto22.jpg",
-  "id": 21,
-  "nombre_completo": "Bases 1",
-  "usuario": "DB1EDITADO"
+    "activo": 1,
+    "contrasena": "123",
+    "foto": "Fotos_Perfil/foto22.jpg",
+    "id": 21,
+    "nombre_completo": "Bases 1",
+    "usuario": "DB1EDITADO"
 }
 
 EDITAR PERFIL
-GET: /home
+GET: /home/<usuario>
 - Body
 - Response
 {
-  "activo": 1,
-  "contrasena": "123",
-  "foto": "Fotos_Perfil/foto22.jpg",
-  "id": 21,
-  "nombre_completo": "Bases 1",
-  "usuario": "DB1EDITADO"
+    "activo": 1,
+    "contrasena": "123",
+    "foto": "Fotos_Perfil/foto22.jpg",
+    "id": 21,
+    "nombre_completo": "Bases 1",
+    "usuario": "DB1EDITADO"
 }
 
 EDITAR (BOTON)
@@ -150,16 +150,16 @@ GET: /getalbumes
 }
 - Response (Incluir cada foto de cada album del usuario)
 {
-  "albumes": [
-    {
-        "nombre": "Foto de perfil",
-        "fotos": []
-    },
-    {
-        "nombre": "Mascotas de la familia",
-        "fotos": []
-    }
-  ]
+    "albumes": [
+        {
+            "nombre": "Foto de perfil",
+            "fotos": []
+        },
+        {
+            "nombre": "Mascotas de la familia",
+            "fotos": []
+        }
+    ]
 }
 
 VER FOTOS POR ALBUM
@@ -171,5 +171,5 @@ GET: /getalbumesfotos
 }
 - Response (Incluir cada foto de cada album del usuario)
 {
-    "fotos": ["", ""]
+    "fotos": []
 }

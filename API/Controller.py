@@ -31,18 +31,18 @@ class Controller:
                     "fullName": usuario[3],
                     "activo": usuario[4]
                 }
-            return {"mensaje": "Usuario o contraseña incorrectos"}
+            return {"mensaje": "Usuario o contraseña incorrectos"}, 200
         except:
-            return {"mensaje": "Error"}
+            return {"mensaje": "Error"}, 500
 
     def logout(self, usuario):
         try:
             query = f'''UPDATE practica1.USER SET practica1.USER.activo = 0 WHERE practica1.USER.user = '{usuario}';'''
             self.cursor.execute(query)
             self.conexion.commit()
-            return {"mensaje": "Sesión Finalizada"}
+            return {"mensaje": "Sesión Finalizada"}, 200
         except:
-            return {"mensaje": "Error"}
+            return {"mensaje": "Error"}, 500
 
     def signin(self, usuario, nombre, contrasena, foto):
         query = f'''SELECT 1 FROM practica1.USER WHERE user = '{usuario}';'''
@@ -68,11 +68,11 @@ class Controller:
                 self.cursor.execute(query_image)
 
                 self.conexion.commit()
-                return {"mensaje": "Usuario registrado exitosamente"}
+                return {"mensaje": "Usuario registrado exitosamente"}, 200
             except:
                 self.conexion.rollback()
-                return {"mensaje": "Error"}
-        return {"mensaje": "Intente con un nuevo nombre de usuario"}
+                return {"mensaje": "Error"}, 500
+        return {"mensaje": "Intente con un nuevo nombre de usuario"}, 500
 
     def home(self, usuario):
         query = f'''SELECT u.*, i.photo
@@ -84,7 +84,6 @@ class Controller:
                 LIMIT 1;'''
         self.cursor.execute(query)
         resultados = self.cursor.fetchall()
-        print(resultados)
         usuario = resultados[0]
         return {
             "id": usuario[0],
@@ -93,9 +92,9 @@ class Controller:
             "fullName": usuario[3],
             "activo": usuario[4],
             "photo": usuario[5]
-        }
+        }, 200
 
-    def edituser(self, id, nuevo_usuario, nombre, contrasena, foto):
+    def edituser(self, id, nuevo_usuario, nombre, _, foto):
         try:
             query = f'''SELECT u.*, i.photo, a.id
                     FROM practica1.USER u
@@ -116,7 +115,7 @@ class Controller:
             if usuario[5].strip() != foto.strip():
                 nueva_foto = f"practica1.USER.user = '{nuevo_usuario.strip()}'"
             if nuevos_datos == "" and nueva_foto == "":
-                return {"mensaje": "No se modificaron datos"}
+                return {"mensaje": "No se modificaron datos"}, 500
             if nuevos_datos != "":
                 query = f"UPDATE practica1.USER SET {nuevos_datos}WHERE practica1.USER.id = {id};"
                 self.cursor.execute(query)
@@ -124,9 +123,9 @@ class Controller:
                 query = f"INSERT INTO IMAGE(photo, albumId) VALUES('{foto}', {usuario[6]});"
                 self.cursor.execute(query)
             self.conexion.commit()
-            return {"mensaje": "Información actualizada"}
+            return {"mensaje": "Información actualizada"}, 200
         except:
-            return {"mensaje": "Error"}
+            return {"mensaje": "Error"}, 500
 
     def getalbumname(self, usuario):
         try:
@@ -141,10 +140,10 @@ class Controller:
             for r in resultados:
                 if r[0] != "Foto de perfil":
                     nombres.append(r[0])
-            return {"albumes": nombres}
+            return {"albumes": nombres}, 200
         except Exception as e:
             print(e)
-            return {"albumes": []}
+            return {"albumes": []}, 500
 
     def getalbumes(self, usuario):
         try:
@@ -163,10 +162,10 @@ class Controller:
                 for r1 in resultados1:
                     album["fotos"].append(r1[1])
                 albumes.append(album)
-            return {"albumes": albumes}
+            return {"albumes": albumes}, 200
         except Exception as e:
             print(e)
-            return {"albumes": []}
+            return {"albumes": []}, 500
 
     def getalbumesfotos(self, usuario, album):
         try:
@@ -182,10 +181,10 @@ class Controller:
             albumes = []
             for r in resultados:
                 albumes.append(r[0])
-            return {"fotos": albumes}
+            return {"fotos": albumes}, 200
         except Exception as e:
             print(e)
-            return {"fotos": []}
+            return {"fotos": []}, 500
 
     def uploadphoto(self, usuario, nombre_foto, nombre_album, foto):
         try:
@@ -199,10 +198,10 @@ class Controller:
             query = f'''INSERT INTO practica1.IMAGE(photo, albumId) VALUES('Fotos_Publicadas/{nombre_foto}.jpg', {resultados[0][0]});'''
             self.cursor.execute(query)
             self.conexion.commit()
-            return {"mensaje": "Fotografía agregada"}
+            return {"mensaje": "Fotografía agregada"}, 200
         except Exception as e:
             print(e)
-            return {"mensaje": "Error"}
+            return {"mensaje": "Error"}, 500
 
     def newalbum(self, usuario, album):
         try:
@@ -218,26 +217,34 @@ class Controller:
                 query = f'''INSERT INTO practica1.ALBUM(albumName, userId) VALUES('{album}', {resultado[0][0]});'''
                 self.cursor.execute(query)
                 self.conexion.commit()
-                return {"mensaje": "Album creado"}
-            return {"mensaje": "Ya existe un album con el mismo nombre"}
+                return {"mensaje": "Album creado"}, 200
+            return {"mensaje": "Ya existe un album con el mismo nombre"}, 500
         except:
-            return {"mensaje": "Error"}
+            return {"mensaje": "Error"}, 500
 
     def editalbum(self, id_usuario, id_album, nombre_album_nuevo):
         try:
             query = f'''UPDATE ALBUM SET albumName = '{nombre_album_nuevo}' WHERE userId = {id_usuario} AND id = {id_album};'''
             self.cursor.execute(query)
             self.conexion.commit()
-            return {"mensaje": "Album actualizado"}
+            return {"mensaje": "Album actualizado"}, 200
         except:
-            return {"mensaje": "Error"}
+            return {"mensaje": "Error"}, 500
 
     def deletealbum(self, usuario, nombre_album):
         try:
-            query = f'''DELETE a FROM ALBUM a INNER JOIN USER u ON a.userId = u.id  WHERE u.user = '{usuario}' AND a.albumName = '{nombre_album}';'''
+            query = f'''SELECT id FROM ALBUM WHERE albumName = '{nombre_album}';'''
+            self.cursor.execute(query)
+            id_album = self.cursor.fetchall()[0][0]
+            query = f'''SELECT id FROM USER WHERE user = '{usuario}';'''
+            self.cursor.execute(query)
+            id_usuario = self.cursor.fetchall()[0][0]
+            query = f'''DELETE FROM IMAGE WHERE albumId = {id_album};'''
+            self.cursor.execute(query)
+            query = f'''DELETE FROM ALBUM WHERE id = {id_album} AND userId = {id_usuario};'''
             self.cursor.execute(query)
             self.conexion.commit()
-            return {"mensaje": "Album eliminado"}
+            return {"mensaje": "Album eliminado"}, 200
         except Exception as e:
             print(e)
-            return {"mensaje": "Error"}
+            return {"mensaje": "Error"}, 500

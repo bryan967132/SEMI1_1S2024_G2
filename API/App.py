@@ -42,22 +42,19 @@ def edituser():
     return ctrlr.edituser(body["id_usuario"], body["usuario_nuevo"], body["nombre"], body["contrasena"], body["foto"])
 
 # NOMBRES DE ALBUMES DE USUARIO (PARA SELECT)
-@app.route('/getalbumname', methods=["GET"])
-def getalbumname():
-    body = request.json
-    return ctrlr.getalbumname(body["usuario"])
+@app.route('/getalbumname/<usuario>', methods=["GET"])
+def getalbumname(usuario):
+    return ctrlr.getalbumname(usuario)
 
 # VER FOTOS
-@app.route('/getalbumes', methods=["GET"])
-def getalbumes():
-    body = request.json
-    return ctrlr.getalbumes(body["usuario"])
+@app.route('/getalbumes/<usuario>', methods=["GET"])
+def getalbumes(usuario):
+    return ctrlr.getalbumes(usuario)
 
 # VER FOTOS POR ALBUM
-@app.route('/getalbumesfotos', methods=["GET"])
-def getalbumesfotos():
-    body = request.json
-    return ctrlr.getalbumesfotos(body["usuario"], body["album"])
+@app.route('/getalbumesfotos/<usuario>/<album>', methods=["GET"])
+def getalbumesfotos(usuario, album):
+    return ctrlr.getalbumesfotos(usuario, album)
 
 # CARGAR FOTOS
 @app.route('/uploadphoto', methods=["POST"])

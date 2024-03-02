@@ -1,5 +1,7 @@
 import mysql.connector
 import hashlib
+import base64
+import boto3
 
 class Controller:
     def __init__(self) -> None:
@@ -10,6 +12,18 @@ class Controller:
             database="practica1"
         )
         self.cursor = self.conexion.cursor()
+        self.s3 = boto3.client('s3')
+
+    def uploadProfileImage(self, carpeta, fotoBase64, nombre_foto):
+        nombre_ruta = f'{carpeta}/{nombre_foto}.jpg'
+        buffer = base64.b64decode(fotoBase64)
+        self.s3.put_object(
+            Bucket = 'practica1-g4-b-imagenes',
+            Key = nombre_ruta,
+            Body = buffer,
+            ContentType='image/jpeg'
+        )
+        return nombre_ruta
 
     def login(self, usuario, contrasena):
         try:
@@ -64,12 +78,15 @@ class Controller:
                 self.cursor.execute("SELECT LAST_INSERT_ID()")
                 album_id = self.cursor.fetchone()[0]
 
-                query_image = f'''INSERT INTO IMAGE(photo, albumId) VALUES('{foto}', {album_id});'''
+                urlImage = self.uploadProfileImage('Fotos_Perfil', foto, "foto1")
+
+                query_image = f'''INSERT INTO IMAGE(photo, albumId) VALUES('{urlImage}', {album_id});'''
                 self.cursor.execute(query_image)
 
                 self.conexion.commit()
                 return {"mensaje": "Usuario registrado exitosamente"}, 200
-            except:
+            except Exception as e:
+                print(e)
                 self.conexion.rollback()
                 return {"mensaje": "Error"}, 500
         return {"mensaje": "Intente con un nuevo nombre de usuario"}, 500
@@ -91,7 +108,7 @@ class Controller:
             "pass": usuario[2],
             "fullName": usuario[3],
             "activo": usuario[4],
-            "photo": usuario[5]
+            "photo": f'https://practica1-g4-b-imagenes.s3.us-east-2.amazonaws.com/{usuario[5]}'
         }, 200
 
     def edituser(self, id, nuevo_usuario, nombre, _, foto):
@@ -110,18 +127,16 @@ class Controller:
             if usuario[1].strip() != nuevo_usuario.strip():
                 nuevos_datos += f"practica1.USER.user = '{nuevo_usuario.strip()}' "
             if usuario[3].strip() != nombre.strip():
-                nuevos_datos += f"practica1.USER.fullName = '{nuevo_usuario.strip()}' "
-            nueva_foto = ""
-            if usuario[5].strip() != foto.strip():
-                nueva_foto = f"practica1.USER.user = '{nuevo_usuario.strip()}'"
-            if nuevos_datos == "" and nueva_foto == "":
-                return {"mensaje": "No se modificaron datos"}, 500
+                nuevos_datos += f"practica1.USER.fullName = '{nombre.strip()}' "
             if nuevos_datos != "":
                 query = f"UPDATE practica1.USER SET {nuevos_datos}WHERE practica1.USER.id = {id};"
                 self.cursor.execute(query)
-            if nueva_foto != "":
-                query = f"INSERT INTO IMAGE(photo, albumId) VALUES('{foto}', {usuario[6]});"
-                self.cursor.execute(query)
+            query = f'''SELECT count(i.id) AS ultimo_id FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id WHERE a.userId = {id} AND a.albumName = 'Foto de perfil';'''
+            self.cursor.execute(query)
+            resultados = self.cursor.fetchall()
+            urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f'foto{int(resultados[0][0]) + 1}')
+            query = f"INSERT INTO IMAGE(photo, albumId) VALUES('{urlImage}', {usuario[6]});"
+            self.cursor.execute(query)
             self.conexion.commit()
             return {"mensaje": "Información actualizada"}, 200
         except:
@@ -195,7 +210,8 @@ class Controller:
                         ) AND practica1.ALBUM.albumName = '{nombre_album}';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            query = f'''INSERT INTO practica1.IMAGE(photo, albumId) VALUES('Fotos_Publicadas/{nombre_foto}.jpg', {resultados[0][0]});'''
+            urlImage = self.uploadProfileImage('Fotos_Publicadas', foto, nombre_foto)
+            query = f'''INSERT INTO practica1.IMAGE(photo, albumId) VALUES('{urlImage}', {resultados[0][0]});'''
             self.cursor.execute(query)
             self.conexion.commit()
             return {"mensaje": "Fotografía agregada"}, 200

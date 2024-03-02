@@ -11,10 +11,10 @@ load_dotenv()
 class Controller:
     def __init__(self) -> None:
         self.conexion = mysql.connector.connect(
-            host=os.getenv('DB_HOST'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASS'),
-            database=os.getenv('DB_DATABASE')
+            host=os.getenv('RDS_HOST'),
+            user=os.getenv('RDS_USER'),
+            password=os.getenv('RDS_PASS'),
+            database=os.getenv('RDS_DATABASE')
         )
         self.cursor = self.conexion.cursor()
         self.s3 = boto3.client('s3')
@@ -23,7 +23,7 @@ class Controller:
         nombre_ruta = f'{carpeta}/{nombre_foto}.jpg'
         buffer = base64.b64decode(fotoBase64)
         self.s3.put_object(
-            Bucket = 'practica1-g4-b-imagenes',
+            Bucket = os.getenv('S3_BUCKET'),
             Key = nombre_ruta,
             Body = buffer,
             ContentType='image/jpeg'

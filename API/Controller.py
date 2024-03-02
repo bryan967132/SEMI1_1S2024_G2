@@ -11,10 +11,10 @@ load_dotenv()
 class Controller:
     def __init__(self) -> None:
         self.conexion = mysql.connector.connect(
-            host=os.getenv('HOST'),
-            user=os.getenv('USER'),
-            password=os.getenv('PASS'),
-            database=os.getenv('DATABASE')
+            host=os.getenv('DB_HOST'),
+            user=os.getenv('DB_USER'),
+            password=os.getenv('DB_PASS'),
+            database=os.getenv('DB_DATABASE')
         )
         self.cursor = self.conexion.cursor()
         self.s3 = boto3.client('s3')

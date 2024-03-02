@@ -33,6 +33,7 @@ def signin():
 # PÁGINA DE INICIO | EDITAR PERFIL (PARA VISUALIZAR INFORMACIÓN)
 @app.route('/home/<usuario>', methods=['GET'])
 def home(usuario):
+    usuario = str(usuario).replace('%20', ' ')
     return ctrlr.home(usuario)
 
 # EDITAR PERFIL (BOTÓN)
@@ -44,16 +45,20 @@ def edituser():
 # NOMBRES DE ALBUMES DE USUARIO (PARA SELECT)
 @app.route('/getalbumname/<usuario>', methods=["GET"])
 def getalbumname(usuario):
+    usuario = str(usuario).replace('%20', ' ')
     return ctrlr.getalbumname(usuario)
 
 # VER FOTOS
 @app.route('/getalbumes/<usuario>', methods=["GET"])
 def getalbumes(usuario):
+    usuario = str(usuario).replace('%20', ' ')
     return ctrlr.getalbumes(usuario)
 
 # VER FOTOS POR ALBUM
 @app.route('/getalbumesfotos/<usuario>/<album>', methods=["GET"])
 def getalbumesfotos(usuario, album):
+    usuario = str(usuario).replace('%20', ' ')
+    album = str(album).replace('%20', ' ')
     return ctrlr.getalbumesfotos(usuario, album)
 
 # CARGAR FOTOS

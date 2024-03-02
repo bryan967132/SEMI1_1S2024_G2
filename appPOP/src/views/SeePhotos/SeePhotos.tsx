@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
+interface Album {
+    nombre: string;
+    fotos: string[];
+}
+
 function SeePhotos() {
     const { user } = useParams();
     const [listAlbums, setListAlbums] = useState<string[]>([]);
@@ -15,7 +20,7 @@ function SeePhotos() {
 
     const handleAlbumSelect = (albumName: string) => {
         setSelectedAlbum(albumName);
-        fetch(`${import.meta.env.VITE_BACKEND_URL}/getalbumesfotos/${user}`, {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/getalbumname/${user}`, {
             method: 'POST', // o 'PUT' si estás actualizando datos
             headers: {
                 'Content-Type': 'application/json',
@@ -51,8 +56,14 @@ function SeePhotos() {
                 }
                 throw new Error('Network response was not ok.');
             })
-            .then(data => {
-                setListAlbums(data)
+            .then((data: { albumes: Album[] })=> {
+                if (Array.isArray(data.albumes)) {
+                    // Utiliza la interfaz Album para tipar los objetos dentro del arreglo
+                    const nombresAlbumes: string[] = data.albumes.map(album => album.nombre);
+                    setListAlbums(nombresAlbumes);
+                } else {
+                    throw new Error('La respuesta de la API no tiene el formato esperado.');
+                }
             })
             .catch(error => {
                 console.error('There has been a problem with your fetch operation:', error);

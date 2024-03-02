@@ -3,6 +3,12 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
+
+interface Album {
+    nombre: string;
+    fotos: string[];
+}
+
 function UploadPhoto() {
     const { user } = useParams();
     const [imgSrc, setImgSrc] = useState('');
@@ -85,8 +91,14 @@ function UploadPhoto() {
                 }
                 throw new Error('Network response was not ok.');
             })
-            .then(data => {
-                setListAlbums(data)
+            .then((data: { albumes: Album[] })=> {
+                if (Array.isArray(data.albumes)) {
+                    // Utiliza la interfaz Album para tipar los objetos dentro del arreglo
+                    const nombresAlbumes: string[] = data.albumes.map(album => album.nombre);
+                    setListAlbums(nombresAlbumes);
+                } else {
+                    throw new Error('La respuesta de la API no tiene el formato esperado.');
+                }
             })
             .catch(error => {
                 console.error('There has been a problem with your fetch operation:', error);

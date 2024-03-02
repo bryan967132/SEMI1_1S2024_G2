@@ -5,11 +5,11 @@ import { useParams } from 'react-router-dom';
 
 interface UserData {
     activo: number;
-    contrasena:string;
-    foto: string;
+    fullName: string;
     id: number;
-    nombre_completo: string;
-    usuario: string;
+    pass:string;
+    photo: string;
+    user: string;
   }
 
 function HomeUserLoggedIn() {
@@ -22,7 +22,7 @@ function HomeUserLoggedIn() {
 
     const handleClose = async () => {
         try {
-            const response = await fetch('https://tu-backend.example.com/api/ruta', {
+            const response = await fetch(`http://127.0.0.1:5000/logout`, {
                 method: 'POST', // o 'PUT' si estás actualizando datos
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,6 +72,7 @@ function HomeUserLoggedIn() {
                 <div className="col-4">
                     <div className={styles['card-left']}>
                         <div className={styles['card-img']}>
+                            <img src={userData?.photo || ''} alt="" />
                         </div>
                     </div>
                 </div>
@@ -79,11 +80,11 @@ function HomeUserLoggedIn() {
                     <div className='container my-4'>
                         <div className="mb-3">
                             <label htmlFor="user-name" className='form-label'>Username</label>
-                            <input type="text" id='user-name' className='form-control' value={userData?.usuario || ''} disabled />
+                            <input type="text" id='user-name' className='form-control' value={userData?.user || ''} disabled />
                         </div>
                         <div className="mb-3">
                             <label htmlFor="full-name" className='form-label'>Name</label>
-                            <input type="text" id='full-name' className='form-control' value={userData?.nombre_completo || ''} disabled />
+                            <input type="text" id='full-name' className='form-control' value={userData?.fullName || ''} disabled />
                         </div>
                     </div>
                 </div>

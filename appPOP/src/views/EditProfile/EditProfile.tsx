@@ -5,11 +5,11 @@ import { useParams } from 'react-router-dom';
 
 interface UserData {
     activo: number;
+    fullName: string;
     contrasena:string;
-    foto: string;
+    photo: string;
     id: number;
-    nombre_completo: string;
-    usuario: string;
+    user: string;
   }
 
 function EditProfile() {
@@ -35,7 +35,7 @@ function EditProfile() {
                 setSelectedFile(file);
                 setFormData(prevState => ({
                     ...prevState,
-                    foto: base64String,
+                    photo: base64String,
                 }));
             };
             reader.readAsDataURL(file);
@@ -52,10 +52,11 @@ function EditProfile() {
 
     const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Para prevenir el comportamiento de envío por defecto del formulario
+        console.log(formData.nombre)
         if (formData.foto !== null) {
             try {
                 const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/edituser`, {
-                    method: 'POST', // o 'PUT' si estás actualizando datos
+                    method: 'PUT', // o 'PUT' si estás actualizando datos
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -64,7 +65,7 @@ function EditProfile() {
                 if (response.ok) {
                     const jsonResponse = await response.json();
                     console.log('Respuesta del servidor:', jsonResponse);
-                    // Procesa la respuesta aquí (por ejemplo, mostrar un mensaje de éxito)
+                    alert("Perfil editado")
                 } else {
                     // Maneja la respuesta de error del servidor
                     console.error('Error en la respuesta del servidor');
@@ -73,9 +74,8 @@ function EditProfile() {
                 alert('Error al enviar los datos');
             }
         } else {
-            alert('Elija una foto de perfil')
+            alert('Elija una photo de perfil')
         }
-        console.log(formData.foto)
     };
 
     useEffect(() => {
@@ -93,12 +93,12 @@ function EditProfile() {
             .then(data => {
                 setFormData({
                     id_usuario: data.id,
-                    usuario_nuevo: data.usuario,
-                    nombre: data.nombre_completo,
+                    usuario_nuevo: data.user,
+                    nombre: data.fullName,
                     contrasena: '',
-                    foto: data.foto
+                    foto: data.photo
                 });
-                setImgSrc(data.foto)
+                setImgSrc(data.photo)
                 setUserData(data)
             })
             .catch(error => {

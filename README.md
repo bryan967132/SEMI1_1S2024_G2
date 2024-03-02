@@ -29,6 +29,24 @@ Los usuarios de este grupo tienen la capacidad de administrar buckets y su conte
 
 Se han creado tres usuarios con los nombres 'User1_S3', 'User2_S3' y 'User3_S3'. 
 
+## Buckets S3
+Se realizo un bucket 'practica1-g4-imagenes' para el almacenamiuento de las imagenes a tulizar
+![S3_1](./Imagenes/S3_1.png )
+Se crearon dos carpetas 'Fotos_Perfil','Fotos_Publicadas'
+![S3_2](./Imagenes/S3_2.png )
+En la carpeta 'Fotos_Perfil' se guarda todas las fotos de perfil de todos los usuarios
+![S3_3](./Imagenes/s3_3.png )
+En la carpeta 'Fotos_Publicadas' se guarda todas las fotos subidas de todos los usuarios
+![S3_4](./Imagenes/s3_4.png )
+
+## EC2
+Se crearon dos instancias ec2 para los backends
+![ec2_1](./Imagenes/ec2_1.png )
+Conexion shh de la ec2 nodejs
+![ec2_2](./Imagenes/ec2_2.png )
+
+## BASE RDS
+
 ## Aplicacion WEB
 
 ### Pagina de inicio

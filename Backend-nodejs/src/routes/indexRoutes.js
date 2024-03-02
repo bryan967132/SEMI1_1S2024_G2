@@ -18,9 +18,9 @@ class IndexRoutes {
         this.router.post('/newalbum', indexController.NuevoAlbum);
         this.router.put('/editalbum', indexController.EditarAlbum);
         this.router.delete('/deletealbum', indexController.EliminarAlbum);
-        this.router.get('/getalbumname', indexController.GetAlbums);
-        this.router.get('/getalbumes', indexController.GetAlbumsFoto);
-        this.router.get('/getalbumesfotos', indexController.GetAlbumesFotos);
+        this.router.get('/getalbumname:/:usuario', indexController.GetAlbums);
+        this.router.get('/getalbumes/:usuario', indexController.GetAlbumsFoto);
+        this.router.get('/getalbumesfotos/:usuario/:album', indexController.GetAlbumesFotos);
         //this.router.get('/getusuario', indexController.GetUsuario);
     }
 }

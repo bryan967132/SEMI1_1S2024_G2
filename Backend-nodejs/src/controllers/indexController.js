@@ -1,6 +1,6 @@
 const { Request, Response } = require('express');
 const pool = require('../database'); // conexión a la base de datos
-const { Encriptar, SubirImagenPublicada, SubirImagenPerfil } = require('../utilidades');
+const { Encriptar, SubirImagenPublicada, SubirImagenPerfil, corregirFormato } = require('../utilidades');
 const dotenv = require('dotenv');
 const path = require('path');
 
@@ -96,7 +96,7 @@ class IndexController {
 
     async Home(req, res) {
         try {
-            const usuario = req.params.usuario;
+            const usuario = corregirFormato(req.params.usuario);
             pool.query(
                 'SELECT u.*, i.photo FROM USER u LEFT JOIN ALBUM a ON u.id = a.userId LEFT JOIN IMAGE i ON a.id = i.albumId WHERE u.user = ? ORDER BY i.id DESC LIMIT 1;',
                 [usuario], (error, results) => {
@@ -255,7 +255,7 @@ class IndexController {
 
     async GetAlbums(req, res) {
         try {
-            const usuario = req.body.usuario;
+            const usuario = params(req.params.usuario);
 
             pool.query(
                 'SELECT a.* FROM ALBUM a INNER JOIN USER u ON a.userId = u.id  WHERE u.user = ?;',
@@ -287,7 +287,7 @@ class IndexController {
 
     async GetAlbumsFoto(req, res) {
         try {
-            const usuario = req.body.usuario;
+            const usuario = params(req.params);
 
             pool.query(
                 'SELECT a.albumName, i.photo FROM ALBUM a INNER JOIN USER u ON a.userId = u.id LEFT JOIN IMAGE i ON a.id = i.albumId WHERE u.user = ?;',
@@ -310,8 +310,8 @@ class IndexController {
 
     async GetAlbumesFotos(req, res) {
         try {
-            const usuario = req.body.usuario;
-            const album = req.body.album;
+            const usuario = corregirFormato(req.params.usuario);
+            const album = corregirFormato(req.params.album);
 
             pool.query(
                 'SELECT i.* FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id INNER JOIN USER u ON a.userId = u.id WHERE u.user = ? AND a.albumName = ?;',

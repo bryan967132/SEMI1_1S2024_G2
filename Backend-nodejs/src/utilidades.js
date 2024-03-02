@@ -44,8 +44,14 @@ function SubirImagenPerfil(foto, nombre_foto) {
     return nombre_ruta;
 }
 
+//corregir formato de parametro
+function corregirFormato(param) {
+    return param.replace('%20', ' ');
+}
+
 module.exports = {
     Encriptar,
     SubirImagenPublicada,
-    SubirImagenPerfil
+    SubirImagenPerfil,
+    corregirFormato
 };

@@ -1,6 +1,6 @@
-import * as mysql from 'mysql';
-import dotenv from 'dotenv';
-import path from 'path';
+const mysql = require('mysql');
+const dotenv = require('dotenv');
+const path = require('path');
 
 const envPath = path.resolve(__dirname, '..', '.env');
 dotenv.config({ path: envPath });
@@ -20,4 +20,4 @@ pool.getConnection((err, connection) => {
   console.log('Base de Datos Proyecto CONECTADA');
 });
 
-export default pool;
+module.exports = pool;

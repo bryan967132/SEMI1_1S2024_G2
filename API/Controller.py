@@ -2,14 +2,19 @@ import mysql.connector
 import hashlib
 import base64
 import boto3
+from dotenv import load_dotenv
+import os
+
+# Carga las variables de entorno desde el archivo .env
+load_dotenv()
 
 class Controller:
     def __init__(self) -> None:
         self.conexion = mysql.connector.connect(
-            host="practica1db.ch6y88yecjjk.us-east-2.rds.amazonaws.com",
-            user="admin",
-            password="IHQCK05YT9zh51xZGSYW",
-            database="practica1"
+            host=os.getenv('HOST'),
+            user=os.getenv('USER'),
+            password=os.getenv('PASS'),
+            database=os.getenv('DATABASE')
         )
         self.cursor = self.conexion.cursor()
         self.s3 = boto3.client('s3')

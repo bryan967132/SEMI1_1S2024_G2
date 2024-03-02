@@ -4,7 +4,6 @@ import styles from './Login.module.scss'
 import logo from '../../assets/img/logo.png'
 
 function Login() {
-
     const [dataLogin, setDataLogin] = useState({
         usuario: '',
         contrasena: '',
@@ -21,7 +20,7 @@ function Login() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Para prevenir el comportamiento de envío por defecto del formulario
         try {
-          const response = await fetch('https://tu-backend.example.com/api/ruta', {
+          const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/login`, {
             method: 'POST', // o 'PUT' si estás actualizando datos
             headers: {
               'Content-Type': 'application/json',

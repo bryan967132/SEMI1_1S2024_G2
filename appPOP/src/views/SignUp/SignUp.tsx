@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import styles from './SignUp.module.scss';
 import { useState } from 'react';
 
+
 function SignUp() {
 
     const [imgSrc, setImgSrc] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [confirmContrasena, setConfirmContrasena] = useState('');
-
     const [formData, setFormData] = useState({
         usuario: '',
         nombre: '',
@@ -18,12 +18,19 @@ function SignUp() {
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const src = URL.createObjectURL(file);
-            setImgSrc(src);
-            setSelectedFile(file);
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64String = reader.result as string;
+                setImgSrc(base64String);
+                setSelectedFile(file);
+                setFormData(prevState => ({
+                    ...prevState,
+                    foto: base64String,
+                }));
+            };
+            reader.readAsDataURL(file);
         }
-    }
-
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -41,24 +48,25 @@ function SignUp() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Para prevenir el comportamiento de envío por defecto del formulario
         if (confirmContrasena === formData.contrasena) {
-            const formDataWithFile = {
-                ...formData,
-                foto: selectedFile, // Incluir el archivo seleccionado en la propiedad 'foto'
-            };
 
-            if (formDataWithFile.foto !== null) {
+            if (formData.foto !== null) {
                 try {
-                    const response = await fetch('https://tu-backend.example.com/api/ruta', {
+                    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/signin`, {
                         method: 'POST', // o 'PUT' si estás actualizando datos
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify(formDataWithFile), // Convierte los datos del formulario a JSON
+                        body: JSON.stringify(formData), // Convierte los datos del formulario a JSON
                     });
                     if (response.ok) {
                         const jsonResponse = await response.json();
                         console.log('Respuesta del servidor:', jsonResponse);
-                        // Procesa la respuesta aquí (por ejemplo, mostrar un mensaje de éxito)
+                        if(jsonResponse.mensaje !== 'Error'){
+                            alert('Cuentra creada con exito');
+                            window.location.href = `/login/`;
+                        }else{
+                            alert('Error usuario ya exite o verifique sus datos');
+                        }
                     } else {
                         // Maneja la respuesta de error del servidor
                         console.error('Error en la respuesta del servidor');
@@ -69,7 +77,7 @@ function SignUp() {
             } else {
                 alert('Elija una foto de perfil')
             }
-            console.log(formDataWithFile.foto)
+            console.log(formData.foto)
         } else {
             alert('Verificique contraseña y su confirmacion');
         }

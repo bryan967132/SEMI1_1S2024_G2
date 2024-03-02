@@ -25,11 +25,11 @@ function App() {
       <Routes>
         <Route path='/login' element={<Login />} />
         <Route path='/signup' element={<SignUp />} />
-        <Route path="/editprofile/:parameter" element={<EditProfile/>}/>
-        <Route path="/homeuserloggedin/:parameter" element={<HomeUserLoggedIn/>}/>
-        <Route path="/uploadphoto/:parameter" element={<UploadPhoto/>}/>
-        <Route path="/editalbum/:parameter" element={<EditAlbum/>}/>
-        <Route path="/seephotos/:parameter" element={<SeePhotos/>}/>
+        <Route path="/editprofile/:user" element={<EditProfile/>}/>
+        <Route path="/homeuserloggedin/:user" element={<HomeUserLoggedIn/>}/>
+        <Route path="/uploadphoto/:user" element={<UploadPhoto/>}/>
+        <Route path="/editalbum/:user" element={<EditAlbum/>}/>
+        <Route path="/seephotos/:user" element={<SeePhotos/>}/>
         <Route element={<Layout />}>
           <Route path='/' element={<Home />} />
         </Route>

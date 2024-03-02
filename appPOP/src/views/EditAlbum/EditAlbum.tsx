@@ -1,27 +1,38 @@
 import styles from './EditAlbum.module.scss'
-import { Link } from 'react-router-dom'
-import { useState } from 'react';
+import { Link, json } from 'react-router-dom'
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
+interface UserData {
+    activo: number;
+    contrasena: string;
+    foto: string;
+    id: number;
+    nombre_completo: string;
+    usuario: string;
+}
+
 function EditAlbum() {
-    const { username } = useParams();
+    const { user } = useParams();
     const [imgSrc, setImgSrc] = useState('');
-    const [listAlbums, setListAlbums] = useState(['opcion 1', 'opcion 2', 'opcion 3']);
+    const [listAlbums, setListAlbums] = useState<string[]>([]);
     const [selectedAlbum, setSelectedAlbum] = useState('');
+    const [userData, setUserData] = useState<UserData | null>(null);
+    const [indiceAlbum, setIndiceAlbum] = useState<number | null>(null)
 
     const [albumNew, setAlbumNew] = useState({
-        usuario: username,
+        usuario: user,
         nombre_album: '',
     });
 
     const [albumEdit, setAlbumEdit] = useState({
-        usuario: username,
+        usuario: user,
         id_album: '',
         nombre_album_nuevo: '',
     });
 
     const [albumDelete, setAlbumDelete] = useState({
-        usuario: username,
+        usuario: user,
         nombre_album: '',
     });
 
@@ -35,18 +46,19 @@ function EditAlbum() {
     };
 
 
-    const handleAlbumSelect = (albumName: string) => {
+    const handleAlbumSelect = (albumName: string, index: number) => {
         setAlbumDelete(prevState => ({
             ...prevState,
             nombre_album: albumName,
         }));
+        setIndiceAlbum(index);
     };
 
 
     const handleAddAlbum = async () => {
         console.log(albumNew.nombre_album)
         try {
-            const response = await fetch('https://tu-backend.example.com/api/ruta', {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/newalbum`, {
                 method: 'POST', // o 'PUT' si estás actualizando datos
                 headers: {
                     'Content-Type': 'application/json',
@@ -67,58 +79,89 @@ function EditAlbum() {
     };
 
     const handleChangeAlbum = async () => {
-        try {
-            const response = await fetch('https://tu-backend.example.com/api/ruta', {
-                method: 'POST', // o 'PUT' si estás actualizando datos
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(albumEdit), // Convierte los datos del formulario a JSON
-            });
-            if (response.ok) {
-                const jsonResponse = await response.json();
-                console.log('Respuesta del servidor:', jsonResponse);
-                // Procesa la respuesta aquí (por ejemplo, mostrar un mensaje de éxito)
-            } else {
-                // Maneja la respuesta de error del servidor
-                console.error('Error en la respuesta del servidor');
+        const albumEditComplet = {
+            ...albumEdit,
+            id_album: indiceAlbum,
+            nombre_album: selectedAlbum,
+        };
+        if (albumEditComplet.id_album !== null) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/editalbum`, {
+                    method: 'POST', // o 'PUT' si estás actualizando datos
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(albumEditComplet), // Convierte los datos del formulario a JSON
+                });
+                if (response.ok) {
+                    const jsonResponse = await response.json();
+                    console.log('Respuesta del servidor:', jsonResponse);
+                    // Procesa la respuesta aquí (por ejemplo, mostrar un mensaje de éxito)
+                } else {
+                    // Maneja la respuesta de error del servidor
+                    console.error('Error en la respuesta del servidor');
+                }
+            } catch (error) {
+                alert('Error al enviar los datos');
             }
-        } catch (error) {
-            alert('Error al enviar los datos');
+        } else {
+            alert('Elija un album para cambiar su nombre')
         }
     };
 
 
     const handleDeleteAlbum = async () => {
         console.log(albumDelete.nombre_album)
-        try {
-            const response = await fetch('https://tu-backend.example.com/api/ruta', {
-                method: 'POST', // o 'PUT' si estás actualizando datos
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(albumDelete), // Convierte los datos del formulario a JSON
-            });
-            if (response.ok) {
-                const jsonResponse = await response.json();
-                console.log('Respuesta del servidor:', jsonResponse);
-                // Procesa la respuesta aquí (por ejemplo, mostrar un mensaje de éxito)
-            } else {
-                // Maneja la respuesta de error del servidor
-                console.error('Error en la respuesta del servidor');
+        if (albumDelete.nombre_album !== '') {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/deletealbum`, {
+                    method: 'POST', // o 'PUT' si estás actualizando datos
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(albumDelete), // Convierte los datos del formulario a JSON
+                });
+                if (response.ok) {
+                    const jsonResponse = await response.json();
+                    console.log('Respuesta del servidor:', jsonResponse);
+                    alert(jsonResponse.mensaje)
+                } else {
+                    // Maneja la respuesta de error del servidor
+                    console.error('Error en la respuesta del servidor');
+                }
+            } catch (error) {
+                alert('Error al enviar los datos');
             }
-        } catch (error) {
-            alert('Error al enviar los datos');
+        } else {
+            alert('Elija un album para eliminar')
         }
-
     };
 
+    useEffect(() => {
+        enviarGet();
+    }, []);
+
+    const enviarGet = () => {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/getalbumes/${user}`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(data => {
+                setListAlbums(data)
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    };
 
     return (
         <div className='container'>
             <div className={styles['container-editalbum']}>
                 <div className="col-1 fixed-top d-flex justify-content-center m-5">
-                    <Link to='/homeuserloggedin'>
+                    <Link to={`/homeuserloggedin/${user}`}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#0d6efd" className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
                             <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                         </svg>
@@ -129,12 +172,12 @@ function EditAlbum() {
                         <div className={styles['card-img']}>
                             {imgSrc && <img src={imgSrc} alt='photo' className={styles.photo} />}
                         </div>
-                        <Link to='/homeuserloggedin'>
+                        <Link to={`/homeuserloggedin/${user}`}>
                             <button className='btn btn-outline-primary mb-4'>
                                 My profile
                             </button>
                         </Link>
-                        <Link to='/seephotos'>
+                        <Link to={`/seephotos/${user}`}>
                             <button className='btn btn-outline-primary mb-4'>
                                 See photos
                             </button>
@@ -167,9 +210,9 @@ function EditAlbum() {
                                         Albums
                                     </button>
                                     <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                        {listAlbums.filter(album => album.trim() !== '').map((album, index) => (
+                                        {listAlbums && listAlbums.map((album, index) => (
                                             <li key={index}>
-                                                <a className="dropdown-item" href="#" onClick={() => handleAlbumSelect(album)}>{album}</a>
+                                                <a className="dropdown-item" href="#" onClick={() => handleAlbumSelect(album, index)}>{album}</a>
                                             </li>
                                         ))}
                                     </ul>

@@ -1,25 +1,46 @@
 import styles from './EditProfile.module.scss'
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+
+interface UserData {
+    activo: number;
+    contrasena:string;
+    foto: string;
+    id: number;
+    nombre_completo: string;
+    usuario: string;
+  }
 
 function EditProfile() {
+    const { user } = useParams();
     const [imgSrc, setImgSrc] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [formData, setFormData] = useState({
+        id_usuario: null,
         usuario_nuevo: '',
         nombre: '',
         contrasena: '',
         foto: '',
     });
+    const [userData, setUserData] = useState<UserData | null>(null);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
-            const src = URL.createObjectURL(file);
-            setImgSrc(src);
-            setSelectedFile(file);
+            const reader = new FileReader();
+            reader.onload = () => {
+                const base64String = reader.result as string;
+                setImgSrc(base64String);
+                setSelectedFile(file);
+                setFormData(prevState => ({
+                    ...prevState,
+                    foto: base64String,
+                }));
+            };
+            reader.readAsDataURL(file);
         }
-    }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -31,19 +52,14 @@ function EditProfile() {
 
     const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Para prevenir el comportamiento de envío por defecto del formulario
-        const formDataWithFile = {
-            ...formData,
-            foto: selectedFile, // Incluir el archivo seleccionado en la propiedad 'foto'
-        };
-
-        if (formDataWithFile.foto !== null) {
+        if (formData.foto !== null) {
             try {
-                const response = await fetch('https://tu-backend.example.com/api/ruta', {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/edituser`, {
                     method: 'POST', // o 'PUT' si estás actualizando datos
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(formDataWithFile), // Convierte los datos del formulario a JSON
+                    body: JSON.stringify(formData), // Convierte los datos del formulario a JSON
                 });
                 if (response.ok) {
                     const jsonResponse = await response.json();
@@ -59,7 +75,35 @@ function EditProfile() {
         } else {
             alert('Elija una foto de perfil')
         }
-        console.log(formDataWithFile.foto)
+        console.log(formData.foto)
+    };
+
+    useEffect(() => {
+        enviarGet();
+    }, []);
+
+    const enviarGet = () => {
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/home/${user}`)
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(data => {
+                setFormData({
+                    id_usuario: data.id,
+                    usuario_nuevo: data.usuario,
+                    nombre: data.nombre_completo,
+                    contrasena: '',
+                    foto: data.foto
+                });
+                setImgSrc(data.foto)
+                setUserData(data)
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
     };
 
     return (
@@ -67,7 +111,7 @@ function EditProfile() {
             <form action="" onSubmit={handleEdit}>
                 <div className={styles['container-edit-profile']}>
                     <div className='col-1 fixed-top d-flex justify-content-center m-5'>
-                        <Link to='/homeuserloggedin'>
+                        <Link to={`/homeuserloggedin/${user}`}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#0d6efd" className="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
                                 <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
                             </svg>

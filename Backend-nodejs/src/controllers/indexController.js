@@ -22,7 +22,7 @@ class IndexController {
                             'UPDATE USER SET activo = 1 WHERE user = ? AND pass = ?;',
                             [usuario, contrasena]
                         );
-                        results[0].photo = process.env.RUTA + results[0].photo;
+                        results[0].photo = results[0].photo;
                         results[0].mensaje = "Se inició sesión";
                         res.json(results[0]);
                     } else {
@@ -108,7 +108,7 @@ class IndexController {
                         return;
                     }
                     if (results && results.length > 0) {
-                        results[0].photo = process.env.RUTA + results[0].photo;
+                        results[0].photo = results[0].photo;
                         results[0].mensaje = "Se obtuvo los datos del usuario";
                         res.json(results[0]);
                     } else {

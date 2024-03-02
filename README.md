@@ -28,3 +28,30 @@ Se ha creado un usuario denominado 'User_rds1'.
 Los usuarios de este grupo tienen la capacidad de administrar buckets y su contenido, utilizándose para acceder al bucket de almacenamiento de imágenes tanto desde el backend como tambien para subir el frontend de la aplicación. Se aplicaron políticas de seguridad específicas, como 'AmazonS3FullAccess', que les otorgan acceso completo a todas las funcionalidades del servicio Amazon S3, restringiendo el acceso a otras funciones de AWS. Esto garantiza una gestión eficiente y segura del almacenamiento de objetos, cumpliendo con los requisitos de la aplicación.
 
 Se han creado tres usuarios con los nombres 'User1_S3', 'User2_S3' y 'User3_S3'. 
+
+## Aplicacion WEB
+
+### Pagina de inicio
+![image](https://github.com/bryan967132/SEMI1_1S2024_Practica1/assets/72292384/b32b9501-5238-402a-8e9b-307518b0fccd)
+
+### Pagina Login
+![Screenshot 2024-03-02 010508](https://github.com/bryan967132/SEMI1_1S2024_Practica1/assets/72292384/f816e495-51af-4659-96b5-e002504ce333)
+
+### Pagina registrar
+![Screenshot 2024-03-02 010517](https://github.com/bryan967132/SEMI1_1S2024_Practica1/assets/72292384/f1df721a-fe7c-4905-b1e1-614ef538e994)
+
+### Pagina Home usuario logeado
+![Screenshot 2024-03-02 010709](https://github.com/bryan967132/SEMI1_1S2024_Practica1/assets/72292384/400b34e3-3b59-47ff-8fa5-5c1d9faaf789)
+
+### Pagina Editar Perfil
+![Screenshot 2024-03-02 010717](https://github.com/bryan967132/SEMI1_1S2024_Practica1/assets/72292384/bb20ada2-af15-4e87-97af-d64b52151e37)
+
+### Pagina ver fotos
+![Screenshot 2024-03-02 010725](https://github.com/bryan967132/SEMI1_1S2024_Practica1/assets/72292384/a7185f67-cd16-40a8-9119-bd6682e63e83)
+
+### Pagina subir foto
+![Screenshot 2024-03-02 010733](https://github.com/bryan967132/SEMI1_1S2024_Practica1/assets/72292384/52563656-f2de-41a5-b2e8-6a657d684392)
+
+### Pagina album
+![Screenshot 2024-03-02 010742](https://github.com/bryan967132/SEMI1_1S2024_Practica1/assets/72292384/8e253413-db97-4667-bdc1-c75e5032ea07)
+

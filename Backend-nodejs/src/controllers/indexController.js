@@ -7,6 +7,9 @@ const path = require('path');
 dotenv.config({ path: path.resolve(__dirname, '..', '.env') });
 
 class IndexController {
+    async Balenciador(req, res) {
+        res.json({ "response": "server is running!!" });
+    }
     async Login(req, res) {
         try {
             const usuario = req.body.usuario;

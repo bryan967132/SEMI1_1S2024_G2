@@ -9,6 +9,7 @@ class IndexRoutes {
     }
 
     config() {
+        this.router.get('/', indexController.Balenciador);
         this.router.post('/login', indexController.Login);
         this.router.post('/logout', indexController.CerrarSesion);
         this.router.post('/signin', indexController.Registrar);

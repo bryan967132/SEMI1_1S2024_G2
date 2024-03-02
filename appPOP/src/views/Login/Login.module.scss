@@ -1,0 +1,16 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+
+.logo{
+    @extend .card-img-top;
+    width: 10vw;
+    height: 10vw;
+}
+
+.card-login{
+    @extend .card;
+    width: 22rem;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 20px 0px 20px 0px;
+}

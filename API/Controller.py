@@ -113,7 +113,7 @@ class Controller:
             "pass": usuario[2],
             "fullName": usuario[3],
             "activo": usuario[4],
-            "photo": f'https://practica1-g4-b-imagenes.s3.us-east-2.amazonaws.com/{usuario[5]}'
+            "photo": usuario[5]
         }, 200
 
     def edituser(self, id, nuevo_usuario, nombre, _, foto):

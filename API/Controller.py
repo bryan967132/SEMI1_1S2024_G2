@@ -244,8 +244,12 @@ class Controller:
         except:
             return {"mensaje": "Error"}, 500
 
-    def editalbum(self, id_usuario, nombre_album_actual, nombre_album_nuevo):
+    def editalbum(self, usuario, nombre_album_actual, nombre_album_nuevo):
         try:
+            query = f"SELECT id FROM USER WHERE fullName = '{usuario}'"
+            self.cursor.execute(query)
+            resultado = self.cursor.fetchall()
+            id_usuario = resultado[0][0]
             query = f'SELECT id FROM ALBUM WHERE albumName = {nombre_album_actual} AND userId = {id_usuario}'
             self.cursor.execute(query)
             resultado = self.cursor.fetchall()

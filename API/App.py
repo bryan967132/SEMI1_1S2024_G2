@@ -77,7 +77,7 @@ def newalbum():
 @app.route('/editalbum', methods=["PUT"])
 def editalbum():
     body = request.json
-    return ctrlr.editalbum(body["usuario"], body["nombre_album_actual"], body["nombre_album_nuevo"])
+    return ctrlr.editalbum(body["usuario"], body["nombre_album_actual"], body["nombre_album"])
 
 # ELIMINAR ALBUM
 @app.route('/deletealbum', methods=["DELETE"])

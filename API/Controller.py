@@ -83,7 +83,7 @@ class Controller:
                 self.cursor.execute("SELECT LAST_INSERT_ID()")
                 album_id = self.cursor.fetchone()[0]
 
-                urlImage = self.uploadProfileImage('Fotos_Perfil', foto, "foto1")
+                urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f"{usuario}-foto1")
 
                 query_image = f'''INSERT INTO IMAGE(photo, albumId) VALUES('{urlImage}', {album_id});'''
                 self.cursor.execute(query_image)
@@ -132,6 +132,8 @@ class Controller:
             if usuario[1].strip() != nuevo_usuario.strip():
                 nuevos_datos += f"practica1.USER.user = '{nuevo_usuario.strip()}' "
             if usuario[3].strip() != nombre.strip():
+                if nuevos_datos != "":
+                    nuevos_datos += ", "
                 nuevos_datos += f"practica1.USER.fullName = '{nombre.strip()}' "
             if nuevos_datos != "":
                 query = f"UPDATE practica1.USER SET {nuevos_datos}WHERE practica1.USER.id = {id};"
@@ -139,7 +141,7 @@ class Controller:
             query = f'''SELECT count(i.id) AS ultimo_id FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id WHERE a.userId = {id} AND a.albumName = 'Foto de perfil';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f'foto{int(resultados[0][0]) + 1}')
+            urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f'{nuevo_usuario}-foto{int(resultados[0][0]) + 1}')
             query = f"INSERT INTO IMAGE(photo, albumId) VALUES('{urlImage}', {usuario[6]});"
             self.cursor.execute(query)
             self.conexion.commit()

@@ -160,8 +160,7 @@ class Controller:
             resultados = self.cursor.fetchall()
             nombres = []
             for r in resultados:
-                if r[0] != "Foto_de_perfil":
-                    nombres.append(r[0])
+                nombres.append(r[0])
             return {"albumes": nombres, "mensaje": "Se obtuvieron los albumes"}, 200
         except Exception as e:
             print(e)

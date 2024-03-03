@@ -162,10 +162,10 @@ class Controller:
             for r in resultados:
                 if r[0] != "Foto de perfil":
                     nombres.append(r[0])
-            return {"albumes": nombres}, 200
+            return {"albumes": nombres, "mensaje": "Se obtuvieron los albumes"}, 200
         except Exception as e:
             print(e)
-            return {"albumes": []}, 500
+            return {"albumes": [], "mensaje": "Error"}, 500
 
     def getalbumes(self, usuario):
         try:

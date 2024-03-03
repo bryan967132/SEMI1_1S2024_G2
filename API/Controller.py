@@ -244,8 +244,12 @@ class Controller:
         except:
             return {"mensaje": "Error"}, 500
 
-    def editalbum(self, id_usuario, id_album, nombre_album_nuevo):
+    def editalbum(self, id_usuario, nombre_album_actual, nombre_album_nuevo):
         try:
+            query = f'SELECT id FROM ALBUM WHERE albumName = {nombre_album_actual} AND userId = {id_usuario}'
+            self.cursor.execute(query)
+            resultado = self.cursor.fetchall()
+            id_album = resultado[0][0]
             query = f'''UPDATE ALBUM SET albumName = '{nombre_album_nuevo}' WHERE userId = {id_usuario} AND id = {id_album};'''
             self.cursor.execute(query)
             self.conexion.commit()

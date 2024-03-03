@@ -6,7 +6,11 @@
 ____________
 ## Descripción de la arquitectura
 
+### Cloud Computing
+Se utiliza AWS que provee servicios en la nube. Los servicios utilizados por FAUNADEX son EC2 para crear instancias para las máquinas virtuales en las que se estarán en ejecución las API's. S3 para el almacenamiento de Imágenes y alojamiento de una página web estática. Y por último RDS para almacenar información mediante una base de datos que utiliza el motor de MySQL.
 
+### Microservicios
+Divide la aplicación en diferentes componentes, como la autenticación, registro, subida de fotos, edición de perfil, entre otros. Cada una de estas funcionalidades se implementa como un microservicio independiente, lo que permite una mayor flexibilidad, escalabilidad y mantenimiento de la aplicación.
 
 ## Usuarios IAM
 Se crearon tres grupos distintos de usuarios con el propósito de asignar roles específicos y facilitar una gestión más eficiente
@@ -31,21 +35,24 @@ Se han creado tres usuarios con los nombres 'User1_S3', 'User2_S3' y 'User3_S3'.
 
 ## Buckets S3
 Se realizo un bucket 'practica1-g4-imagenes' para el almacenamiuento de las imagenes a tulizar
-![S3_1](./Imagenes/S3_1.png )
+![S3_1](./Imagenes/S3_1.png )  
 Se crearon dos carpetas 'Fotos_Perfil','Fotos_Publicadas'
-![S3_2](./Imagenes/S3_2.png )
+![S3_2](./Imagenes/S3_2.png )  
 En la carpeta 'Fotos_Perfil' se guarda todas las fotos de perfil de todos los usuarios
-![S3_3](./Imagenes/s3_3.png )
+![S3_3](./Imagenes/s3_3.png )  
 En la carpeta 'Fotos_Publicadas' se guarda todas las fotos subidas de todos los usuarios
-![S3_4](./Imagenes/s3_4.png )
+![S3_4](./Imagenes/s3_4.png )  
 
 ## EC2
-Se crearon dos instancias ec2 para los backends
-![ec2_1](./Imagenes/ec2_1.png )
-Conexion shh de la ec2 nodejs
-![ec2_2](./Imagenes/ec2_2.png )
+Se crearon dos instancias ec2 para los backends  
+![ec2_1](./Imagenes/ec2_1.png )  
+Conexion shh de la ec2 nodejs  
+![ec2_2](./Imagenes/ec2_2.png )  
+Conexion shh de la ec2 python  
+![ec2_2](./Imagenes/ec2_3.png )  
 
 ## BASE RDS
+![ec2_2](./Imagenes/rds_1.png )  
 
 ## Aplicacion WEB
 

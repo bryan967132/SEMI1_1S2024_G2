@@ -77,7 +77,7 @@ class Controller:
                 self.cursor.execute("SELECT LAST_INSERT_ID()")
                 user_id = self.cursor.fetchone()[0]
 
-                query_album = f'''INSERT INTO ALBUM(albumName, userId) VALUES('Foto de perfil', {user_id});'''
+                query_album = f'''INSERT INTO ALBUM(albumName, userId) VALUES('Foto_de_perfil', {user_id});'''
                 self.cursor.execute(query_album)
 
                 self.cursor.execute("SELECT LAST_INSERT_ID()")
@@ -120,7 +120,7 @@ class Controller:
         try:
             query = f'''SELECT u.*, i.photo, a.id
                     FROM practica1.USER u
-                    JOIN practica1.ALBUM a ON u.id = a.userId AND a.albumName = 'Foto de perfil'
+                    JOIN practica1.ALBUM a ON u.id = a.userId AND a.albumName = 'Foto_de_perfil'
                     JOIN practica1.IMAGE i ON a.id = i.albumId
                     WHERE u.id = {id}
                     ORDER BY i.id DESC
@@ -138,7 +138,7 @@ class Controller:
             if nuevos_datos != "":
                 query = f"UPDATE practica1.USER SET {nuevos_datos}WHERE practica1.USER.id = {id};"
                 self.cursor.execute(query)
-            query = f'''SELECT count(i.id) AS ultimo_id FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id WHERE a.userId = {id} AND a.albumName = 'Foto de perfil';'''
+            query = f'''SELECT count(i.id) AS ultimo_id FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id WHERE a.userId = {id} AND a.albumName = 'Foto_de_perfil';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
             urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f'{nuevo_usuario}-foto{int(resultados[0][0]) + 1}')
@@ -160,7 +160,7 @@ class Controller:
             resultados = self.cursor.fetchall()
             nombres = []
             for r in resultados:
-                if r[0] != "Foto de perfil":
+                if r[0] != "Foto_de_perfil":
                     nombres.append(r[0])
             return {"albumes": nombres, "mensaje": "Se obtuvieron los albumes"}, 200
         except Exception as e:
@@ -172,7 +172,7 @@ class Controller:
             query = f'''SELECT id FROM practica1.USER WHERE practica1.USER.user = '{usuario}';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            query = f'''SELECT id, albumName FROM practica1.ALBUM WHERE practica1.ALBUM.userId = {resultados[0][0]} AND practica1.ALBUM.albumName != 'Foto de perfil';'''
+            query = f'''SELECT id, albumName FROM practica1.ALBUM WHERE practica1.ALBUM.userId = {resultados[0][0]} AND practica1.ALBUM.albumName != 'Foto_de_perfil';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
             albumes = []

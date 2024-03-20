@@ -40,12 +40,12 @@ class Controller:
         try:
             hash_md5 = hashlib.md5()
             hash_md5.update(contrasena.encode())
-            query = f"SELECT * FROM practica1.USER WHERE user = '{usuario}' AND pass = '{hash_md5.hexdigest()}';"
+            query = f"SELECT * FROM practica2.USER WHERE user = '{usuario}' AND pass = '{hash_md5.hexdigest()}';"
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
             if len(resultados) == 1:
                 usuario = resultados[0]
-                query = f"UPDATE practica1.USER SET practica1.USER.activo = 1 WHERE practica1.USER.id = {usuario[0]};"
+                query = f"UPDATE practica2.USER SET practica2.USER.activo = 1 WHERE practica2.USER.id = {usuario[0]};"
                 self.cursor.execute(query)
                 self.conexion.commit()
                 return {
@@ -62,7 +62,7 @@ class Controller:
 
     def logout(self, usuario):
         try:
-            query = f'''UPDATE practica1.USER SET practica1.USER.activo = 0 WHERE practica1.USER.user = '{usuario}';'''
+            query = f'''UPDATE practica2.USER SET practica2.USER.activo = 0 WHERE practica2.USER.user = '{usuario}';'''
             self.cursor.execute(query)
             self.conexion.commit()
             return {"mensaje": "Sesión Finalizada"}, 200
@@ -70,14 +70,14 @@ class Controller:
             return {"mensaje": "Error"}, 500
 
     def signin(self, usuario, nombre, contrasena, foto):
-        query = f'''SELECT 1 FROM practica1.USER WHERE user = '{usuario}';'''
+        query = f'''SELECT 1 FROM practica2.USER WHERE user = '{usuario}';'''
         self.cursor.execute(query)
         resultado = self.cursor.fetchall()
         if len(resultado) == 0:
             try:
                 hash_md5 = hashlib.md5()
                 hash_md5.update(contrasena.encode())
-                query_user = f'''INSERT INTO practica1.USER(user, pass, fullName, activo) VALUES('{usuario}', '{hash_md5.hexdigest()}', '{nombre}', 0);'''
+                query_user = f'''INSERT INTO practica2.USER(user, pass, fullName, activo) VALUES('{usuario}', '{hash_md5.hexdigest()}', '{nombre}', 0);'''
                 self.cursor.execute(query_user)
 
                 self.cursor.execute("SELECT LAST_INSERT_ID()")
@@ -104,9 +104,9 @@ class Controller:
 
     def home(self, usuario):
         query = f'''SELECT u.*, i.photo
-                FROM practica1.USER u
-                JOIN practica1.ALBUM a ON u.id = a.userId
-                JOIN practica1.IMAGE i ON a.id = i.albumId
+                FROM practica2.USER u
+                JOIN practica2.ALBUM a ON u.id = a.userId
+                JOIN practica2.IMAGE i ON a.id = i.albumId
                 WHERE u.user = '{usuario}'
                 ORDER BY i.id DESC
                 LIMIT 1;'''
@@ -125,9 +125,9 @@ class Controller:
     def edituser(self, id, nuevo_usuario, nombre, _, foto):
         try:
             query = f'''SELECT u.*, i.photo, a.id
-                    FROM practica1.USER u
-                    JOIN practica1.ALBUM a ON u.id = a.userId AND a.albumName = 'Foto_de_perfil'
-                    JOIN practica1.IMAGE i ON a.id = i.albumId
+                    FROM practica2.USER u
+                    JOIN practica2.ALBUM a ON u.id = a.userId AND a.albumName = 'Foto_de_perfil'
+                    JOIN practica2.IMAGE i ON a.id = i.albumId
                     WHERE u.id = {id}
                     ORDER BY i.id DESC
                     LIMIT 1;'''
@@ -136,13 +136,13 @@ class Controller:
             nuevos_datos = ""
             usuario = resultados[0]
             if usuario[1].strip() != nuevo_usuario.strip():
-                nuevos_datos += f"practica1.USER.user = '{nuevo_usuario.strip()}' "
+                nuevos_datos += f"practica2.USER.user = '{nuevo_usuario.strip()}' "
             if usuario[3].strip() != nombre.strip():
                 if nuevos_datos != "":
                     nuevos_datos += ", "
-                nuevos_datos += f"practica1.USER.fullName = '{nombre.strip()}' "
+                nuevos_datos += f"practica2.USER.fullName = '{nombre.strip()}' "
             if nuevos_datos != "":
-                query = f"UPDATE practica1.USER SET {nuevos_datos}WHERE practica1.USER.id = {id};"
+                query = f"UPDATE practica2.USER SET {nuevos_datos}WHERE practica2.USER.id = {id};"
                 self.cursor.execute(query)
             query = f'''SELECT count(i.id) AS ultimo_id FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id WHERE a.userId = {id} AND a.albumName = 'Foto_de_perfil';'''
             self.cursor.execute(query)
@@ -157,10 +157,10 @@ class Controller:
 
     def getalbumname(self, usuario):
         try:
-            query = f'''SELECT albumName FROM practica1.ALBUM
-                        WHERE practica1.ALBUM.userId IN (
-                            SELECT id FROM practica1.USER
-                            WHERE practica1.USER.user = '{usuario}'
+            query = f'''SELECT albumName FROM practica2.ALBUM
+                        WHERE practica2.ALBUM.userId IN (
+                            SELECT id FROM practica2.USER
+                            WHERE practica2.USER.user = '{usuario}'
                         );'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
@@ -174,16 +174,16 @@ class Controller:
 
     def getalbumes(self, usuario):
         try:
-            query = f'''SELECT id FROM practica1.USER WHERE practica1.USER.user = '{usuario}';'''
+            query = f'''SELECT id FROM practica2.USER WHERE practica2.USER.user = '{usuario}';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            query = f'''SELECT id, albumName FROM practica1.ALBUM WHERE practica1.ALBUM.userId = {resultados[0][0]} AND practica1.ALBUM.albumName != 'Foto_de_perfil';'''
+            query = f'''SELECT id, albumName FROM practica2.ALBUM WHERE practica2.ALBUM.userId = {resultados[0][0]} AND practica2.ALBUM.albumName != 'Foto_de_perfil';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
             albumes = []
             for r in resultados:
                 album = {"nombre": r[1], "fotos": []}
-                query = f'SELECT * FROM practica1.IMAGE WHERE practica1.IMAGE.albumId = {r[0]}'
+                query = f'SELECT * FROM practica2.IMAGE WHERE practica2.IMAGE.albumId = {r[0]}'
                 self.cursor.execute(query)
                 resultados1 = self.cursor.fetchall()
                 for r1 in resultados1:
@@ -196,13 +196,13 @@ class Controller:
 
     def getalbumesfotos(self, usuario, album):
         try:
-            query = f'''SELECT id FROM practica1.USER WHERE practica1.USER.user = '{usuario}';'''
+            query = f'''SELECT id FROM practica2.USER WHERE practica2.USER.user = '{usuario}';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            query = f'''SELECT id FROM practica1.ALBUM WHERE practica1.ALBUM.userId = {resultados[0][0]} AND practica1.ALBUM.albumName = '{album}';'''
+            query = f'''SELECT id FROM practica2.ALBUM WHERE practica2.ALBUM.userId = {resultados[0][0]} AND practica2.ALBUM.albumName = '{album}';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            query = f'SELECT photo FROM practica1.IMAGE WHERE practica1.IMAGE.albumId = {resultados[0][0]}'
+            query = f'SELECT photo FROM practica2.IMAGE WHERE practica2.IMAGE.albumId = {resultados[0][0]}'
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
             albumes = []
@@ -215,15 +215,15 @@ class Controller:
 
     def uploadphoto(self, usuario, nombre_foto, nombre_album, foto):
         try:
-            query = f'''SELECT id FROM practica1.ALBUM
-                        WHERE practica1.ALBUM.userId IN (
-                            SELECT id FROM practica1.USER
-                            WHERE practica1.USER.user = '{usuario}'
-                        ) AND practica1.ALBUM.albumName = '{nombre_album}';'''
+            query = f'''SELECT id FROM practica2.ALBUM
+                        WHERE practica2.ALBUM.userId IN (
+                            SELECT id FROM practica2.USER
+                            WHERE practica2.USER.user = '{usuario}'
+                        ) AND practica2.ALBUM.albumName = '{nombre_album}';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
             urlImage = self.uploadProfileImage('Fotos_Publicadas', foto, nombre_foto)
-            query = f'''INSERT INTO practica1.IMAGE(photo, albumId) VALUES('{urlImage}', {resultados[0][0]});'''
+            query = f'''INSERT INTO practica2.IMAGE(photo, albumId) VALUES('{urlImage}', {resultados[0][0]});'''
             self.cursor.execute(query)
             self.conexion.commit()
             return {"mensaje": "Fotografía agregada"}, 200
@@ -233,16 +233,16 @@ class Controller:
 
     def newalbum(self, usuario, album):
         try:
-            query = f'''SELECT id FROM practica1.USER WHERE user = '{usuario}';'''
+            query = f'''SELECT id FROM practica2.USER WHERE user = '{usuario}';'''
             self.cursor.execute(query)
             resultado = self.cursor.fetchall()
 
-            query = f'''SELECT id FROM practica1.ALBUM WHERE userId = {resultado[0][0]} AND albumName = '{album}';'''
+            query = f'''SELECT id FROM practica2.ALBUM WHERE userId = {resultado[0][0]} AND albumName = '{album}';'''
             self.cursor.execute(query)
             resultado1 = self.cursor.fetchall()
 
             if len(resultado1) == 0:
-                query = f'''INSERT INTO practica1.ALBUM(albumName, userId) VALUES('{album}', {resultado[0][0]});'''
+                query = f'''INSERT INTO practica2.ALBUM(albumName, userId) VALUES('{album}', {resultado[0][0]});'''
                 self.cursor.execute(query)
                 self.conexion.commit()
                 return {"mensaje": "Album creado"}, 200

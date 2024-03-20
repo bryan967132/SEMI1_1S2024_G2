@@ -1,0 +1,64 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+
+
+.logo {
+    @extend .card-img-top;
+    width: 10vw;
+    height: 10vw;
+}
+
+.hiddenInput {
+    display: none;
+}
+
+.errorConfirm{
+    @extend .form-control;
+}
+
+.errorConfirm:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 25, 0, 0.5);
+    border-color: #ff0400; 
+}
+
+.photo{
+    height: 100%;
+    width: 100%;
+}
+
+.card-sign-up {
+    @extend .card;
+    width: 48rem;
+    margin: auto;
+    border: none;
+}
+
+.card-img {
+    @extend .card;
+    width: 8rem;
+    height: 8rem;
+    margin: 50px auto;
+}
+
+.card-left {
+    @extend .card;
+    width: 18rem;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 20px 0px 0px 0px;
+    border-right: none;
+}
+
+.card-right {
+    @extend .card;
+    width: 28rem;
+    border-radius: 0px 0px 20px 0px;
+    border-left: none;
+}
+
+.card-footer-right {
+    @extend .card-footer, .text-center;
+    border: none;
+    background-color: white;
+    padding: 2px;
+}

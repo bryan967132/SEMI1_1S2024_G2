@@ -337,7 +337,6 @@ class Controller:
                         return {"mensaje": "Fotografía agregada"}, 200
 
             if not album_existente:  # Si no existe un álbum con la etiqueta se crea uno nuevo
-                print("se crea")
                 query_insert_album = f'''INSERT INTO practica2.ALBUM (albumName, userId) 
                                         VALUES ('{etiquetas[0]}', (SELECT id FROM practica2.USER WHERE user = '{usuario}'));'''
                 self.cursor.execute(query_insert_album)

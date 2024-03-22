@@ -83,7 +83,7 @@ class Controller:
                 self.cursor.execute("SELECT LAST_INSERT_ID()")
                 user_id = self.cursor.fetchone()[0]
 
-                query_album = f'''INSERT INTO ALBUM(albumName, userId) VALUES('Foto_de_perfil', {user_id});'''
+                query_album = f'''INSERT INTO practica2.ALBUM(albumName, userId) VALUES('Foto_de_perfil', {user_id});'''
                 self.cursor.execute(query_album)
 
                 self.cursor.execute("SELECT LAST_INSERT_ID()")
@@ -91,7 +91,7 @@ class Controller:
 
                 urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f"{usuario}-foto1")
 
-                query_image = f'''INSERT INTO IMAGE(photo, albumId) VALUES('{urlImage}', {album_id});'''
+                query_image = f'''INSERT INTO practica2.IMAGE(photo, descriptionn, albumId) VALUES('{urlImage}', 'Foto de Perfil', {album_id});'''
                 self.cursor.execute(query_image)
 
                 self.conexion.commit()
@@ -103,13 +103,7 @@ class Controller:
         return {"mensaje": "Intente con un nuevo nombre de usuario"}, 500
 
     def home(self, usuario):
-        query = f'''SELECT u.*, i.photo
-                FROM practica2.USER u
-                JOIN practica2.ALBUM a ON u.id = a.userId
-                JOIN practica2.IMAGE i ON a.id = i.albumId
-                WHERE u.user = '{usuario}'
-                ORDER BY i.id DESC
-                LIMIT 1;'''
+        query = f'''SELECT u.*, i.photo FROM practica2.USER u LEFT JOIN practica2.ALBUM a ON u.id = a.userId LEFT JOIN practica2.IMAGE i ON a.id = i.albumId WHERE u.user = '{usuario}' ORDER BY i.id DESC LIMIT 1;'''
         self.cursor.execute(query)
         resultados = self.cursor.fetchall()
         usuario = resultados[0]
@@ -123,6 +117,7 @@ class Controller:
         }, 200
 
     def edituser(self, id, nuevo_usuario, nombre, _, foto):
+        print(id, nuevo_usuario, nombre, foto)
         try:
             query = f'''SELECT u.*, i.photo, a.id
                     FROM practica2.USER u
@@ -144,15 +139,16 @@ class Controller:
             if nuevos_datos != "":
                 query = f"UPDATE practica2.USER SET {nuevos_datos}WHERE practica2.USER.id = {id};"
                 self.cursor.execute(query)
-            query = f'''SELECT count(i.id) AS ultimo_id FROM IMAGE i INNER JOIN ALBUM a ON i.albumId = a.id WHERE a.userId = {id} AND a.albumName = 'Foto_de_perfil';'''
+            query = f'''SELECT count(i.id) AS ultimo_id FROM practica2.IMAGE i INNER JOIN practica2.ALBUM a ON i.albumId = a.id WHERE a.userId = {id} AND a.albumName = 'Foto_de_perfil';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
             urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f'{nuevo_usuario}-foto{int(resultados[0][0]) + 1}')
-            query = f"INSERT INTO IMAGE(photo, albumId) VALUES('{urlImage}', {usuario[6]});"
+            query = f"INSERT INTO practica2.IMAGE(photo, albumId) VALUES('{urlImage}', {usuario[6]});"
             self.cursor.execute(query)
             self.conexion.commit()
             return {"mensaje": "Información actualizada"}, 200
-        except:
+        except Exception as e:
+            print(e)
             return {"mensaje": "Error"}, 500
 
     def getalbumname(self, usuario):
@@ -223,7 +219,7 @@ class Controller:
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
             urlImage = self.uploadProfileImage('Fotos_Publicadas', foto, nombre_foto)
-            query = f'''INSERT INTO practica2.IMAGE(photo, albumId) VALUES('{urlImage}', {resultados[0][0]});'''
+            query = f'''INSERT INTO practica2.IMAGE(photo, descriptionn, albumId) VALUES('{urlImage}', '', {resultados[0][0]});'''
             self.cursor.execute(query)
             self.conexion.commit()
             return {"mensaje": "Fotografía agregada"}, 200

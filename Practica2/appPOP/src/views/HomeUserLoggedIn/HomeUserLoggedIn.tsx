@@ -15,7 +15,6 @@ interface UserData {
 function HomeUserLoggedIn() {
     const { user } = useParams();
     const [userData, setUserData] = useState<UserData | null>(null);
-
     const dataUser = {
         usuario: user,
     };
@@ -23,7 +22,7 @@ function HomeUserLoggedIn() {
     const handleClose = async () => {
         try {
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/logout`, {
-                method: 'POST', // o 'PUT' si estás actualizando datos
+                method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -72,7 +71,7 @@ function HomeUserLoggedIn() {
                 <div className="col-4">
                     <div className={styles['card-left']}>
                         <div className={styles['card-img']}>
-                            <img src={userData?.photo || ''} alt="" />
+                            <img src={`${import.meta.env.VITE_S3_URL}`+userData?.photo || ''} alt="" />
                         </div>
                     </div>
                 </div>

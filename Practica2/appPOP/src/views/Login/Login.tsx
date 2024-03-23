@@ -2,12 +2,19 @@ import { Link } from 'react-router-dom';
 import React, { useState } from 'react';
 import styles from './Login.module.scss'
 import logo from '../../assets/img/logo.png'
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
     const [dataLogin, setDataLogin] = useState({
         usuario: '',
         contrasena: '',
     });
+
+    const navigate = useNavigate();
+    const goHome = () =>{
+        navigate(`/homeuserloggedin/${dataLogin.usuario}`)
+        console.log('estoy dentro')
+    }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -33,7 +40,7 @@ function Login() {
             console.log('Respuesta del servidor:', jsonResponse);
             if(jsonResponse.mensaje !== 'Error'){
                 alert('Bienvenido');
-                window.location.href = `/homeuserloggedin/${dataLogin.usuario}`;
+                goHome();
             }else{
                 alert('Error no existe usuario o verificque usario y contraseña');
             }

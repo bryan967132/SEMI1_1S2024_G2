@@ -3,29 +3,18 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-interface Album {
-    nombre: string;
-    fotos: string[];
-}
-
 function SeePhotos() {
     const { user } = useParams();
     const [listAlbums, setListAlbums] = useState<string[]>([]);
-    const [selectedAlbum, setSelectedAlbum] = useState('');
     const [listImg, setListImg] = useState<string[]>([]);
-    const [formData, setFormData] = useState({
-        usuario: user,
-        nombre_album: '',
-    });
 
     const handleAlbumSelect = (albumName: string) => {
-        setSelectedAlbum(albumName);
-        fetch(`${import.meta.env.VITE_BACKEND_URL}/getalbumname/${user}`, {
-            method: 'POST', // o 'PUT' si estás actualizando datos
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/getalbumesfotos/${user}/${albumName}`, {
+            method: 'GET', // o 'PUT' si estás actualizando datos
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formData), // Convierte los datos del formulario a JSON
+
         })
             .then(response => {
                 if (response.ok) {
@@ -34,9 +23,12 @@ function SeePhotos() {
                     throw new Error('Error en la respuesta del servidor');
                 }
             })
-            .then(jsonResponse => {
-                console.log('Respuesta del servidor:', jsonResponse);
-                setListImg(jsonResponse)
+            .then((data: { fotos: string[] })=> {
+                if (Array.isArray(data.fotos)) {
+                    setListImg(data.fotos);
+                } else {
+                    throw new Error('La respuesta de la API no tiene el formato esperado.');
+                }
             })
             .catch(error => {
                 console.error('Error al enviar los datos:', error);
@@ -49,18 +41,16 @@ function SeePhotos() {
     }, []);
 
     const enviarGet = () => {
-        fetch(`${import.meta.env.VITE_BACKEND_URL}/getalbumes/${user}`)
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/getalbumname/${user}`)
             .then(response => {
                 if (response.ok) {
                     return response.json();
                 }
                 throw new Error('Network response was not ok.');
             })
-            .then((data: { albumes: Album[] })=> {
+            .then((data: { albumes: string[] })=> {
                 if (Array.isArray(data.albumes)) {
-                    // Utiliza la interfaz Album para tipar los objetos dentro del arreglo
-                    const nombresAlbumes: string[] = data.albumes.map(album => album.nombre);
-                    setListAlbums(nombresAlbumes);
+                    setListAlbums(data.albumes);
                 } else {
                     throw new Error('La respuesta de la API no tiene el formato esperado.');
                 }
@@ -119,7 +109,7 @@ function SeePhotos() {
                 <div className={styles['album']}>
                     {listImg && listImg.map((img, index) => (
                         <div className={styles['card-img-album']} key={index}>
-                            <img src={img} alt="" className={styles['card-img-album']} />
+                            <img src={`${import.meta.env.VITE_S3_URL}`+img} alt="" className={styles['card-img-album']} />
                         </div>
                     ))}
                 </div>

@@ -2,20 +2,12 @@ import styles from './EditProfile.module.scss'
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-
-interface UserData {
-    activo: number;
-    fullName: string;
-    contrasena:string;
-    photo: string;
-    id: number;
-    user: string;
-  }
+import { useNavigate } from 'react-router-dom';
 
 function EditProfile() {
     const { user } = useParams();
     const [imgSrc, setImgSrc] = useState('');
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [changeImg, setChangeImg] = useState(false);
     const [formData, setFormData] = useState({
         id_usuario: null,
         usuario_nuevo: '',
@@ -23,23 +15,29 @@ function EditProfile() {
         contrasena: '',
         foto: '',
     });
-    const [userData, setUserData] = useState<UserData | null>(null);
+
+    const navigate = useNavigate();
+    const goHome = () =>{
+        navigate(`/homeuserloggedin/${formData.usuario_nuevo}`)
+        console.log('estoy dentro')
+    }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             const reader = new FileReader();
             reader.onload = () => {
-                const base64String = reader.result as string;
+                let base64String = reader.result as string;
+                var base64Parts = base64String.split(',');
                 setImgSrc(base64String);
-                setSelectedFile(file);
                 setFormData(prevState => ({
                     ...prevState,
-                    photo: base64String,
+                    foto: base64Parts[1],
                 }));
             };
             reader.readAsDataURL(file);
         }
+        setChangeImg(true);
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,7 +50,7 @@ function EditProfile() {
 
     const handleEdit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Para prevenir el comportamiento de envío por defecto del formulario
-        console.log(formData.nombre)
+        console.log(formData.id_usuario)
         if (formData.foto !== null) {
             try {
                 const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/edituser`, {
@@ -66,6 +64,7 @@ function EditProfile() {
                     const jsonResponse = await response.json();
                     console.log('Respuesta del servidor:', jsonResponse);
                     alert("Perfil editado")
+                    goHome();
                 } else {
                     // Maneja la respuesta de error del servidor
                     console.error('Error en la respuesta del servidor');
@@ -99,7 +98,6 @@ function EditProfile() {
                     foto: data.photo
                 });
                 setImgSrc(data.photo)
-                setUserData(data)
             })
             .catch(error => {
                 console.error('There has been a problem with your fetch operation:', error);
@@ -120,6 +118,8 @@ function EditProfile() {
                     <div className="col-6">
                         <div className={styles['card-left']}>
                             <div className={styles['card-img']}>
+                                {imgSrc && <img src={`${import.meta.env.VITE_S3_URL}`+imgSrc} alt='photo' 
+                                className={changeImg===false? styles.photo:styles.photohiden} />}
                                 {imgSrc && <img src={imgSrc} alt='photo' className={styles.photo} />}
                             </div>
                             <label htmlFor="imgPhoto" className='btn btn-outline-primary mb-4'>New photo</label>

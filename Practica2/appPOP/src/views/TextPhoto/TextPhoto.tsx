@@ -6,7 +6,6 @@ import { useParams } from 'react-router-dom';
 function TextPhoto() {
     const { user } = useParams();
     const [imgSrc, setImgSrc] = useState('');
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [text, setText] = useState('');
     const [formData, setFormData] = useState({
         photo: '',
@@ -19,7 +18,6 @@ function TextPhoto() {
             reader.onloadend = () => {
                 const base64String = reader.result?.toString().split(",")[1];
                 setImgSrc(reader.result as string);
-                setSelectedFile(file);
                 setFormData(prevState => ({
                     ...prevState,
                     photo: base64String || '',

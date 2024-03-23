@@ -103,7 +103,7 @@ class Controller:
         return {"mensaje": "Intente con un nuevo nombre de usuario"}, 500
 
     def home(self, usuario):
-        query = f'''SELECT u.*, i.photo FROM practica2.USER u LEFT JOIN practica2.ALBUM a ON u.id = a.userId LEFT JOIN practica2.IMAGE i ON a.id = i.albumId WHERE u.user = '{usuario}' ORDER BY i.id DESC LIMIT 1;'''
+        query = f'''SELECT u.*, i.photo FROM practica2.USER u LEFT JOIN practica2.ALBUM a ON u.id = a.userId LEFT JOIN practica2.IMAGE i ON a.id = i.albumId WHERE u.user = '{usuario}' AND a.albumName='Foto_de_Perfil' ORDER BY i.id DESC LIMIT 1;'''
         self.cursor.execute(query)
         resultados = self.cursor.fetchall()
         usuario = resultados[0]

@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import styles from './SignUp.module.scss';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 
 function SignUp() {
 
     const [imgSrc, setImgSrc] = useState('');
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [confirmContrasena, setConfirmContrasena] = useState('');
     const [formData, setFormData] = useState({
         usuario: '',
@@ -15,17 +15,22 @@ function SignUp() {
         foto: '',
     });
 
+    const navigate = useNavigate();
+    const goLogin = () =>{
+        navigate(`/login/`)
+    }
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             const reader = new FileReader();
             reader.onload = () => {
-                const base64String = reader.result as string;
+                let base64String = reader.result as string;
+                var base64Parts = base64String.split(',');
                 setImgSrc(base64String);
-                setSelectedFile(file);
                 setFormData(prevState => ({
                     ...prevState,
-                    foto: base64String,
+                    foto: base64Parts[1],
                 }));
             };
             reader.readAsDataURL(file);
@@ -63,7 +68,7 @@ function SignUp() {
                         console.log('Respuesta del servidor:', jsonResponse);
                         if(jsonResponse.mensaje !== 'Error'){
                             alert('Cuentra creada con exito');
-                            window.location.href = `/login/`;
+                            goLogin();
                         }else{
                             alert('Error usuario ya exite o verifique sus datos');
                         }
@@ -77,7 +82,6 @@ function SignUp() {
             } else {
                 alert('Elija una foto de perfil')
             }
-            console.log(formData.foto)
         } else {
             alert('Verificique contraseña y su confirmacion');
         }

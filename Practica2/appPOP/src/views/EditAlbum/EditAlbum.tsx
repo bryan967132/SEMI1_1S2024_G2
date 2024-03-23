@@ -1,29 +1,14 @@
 import styles from './EditAlbum.module.scss'
-import { Link, json } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
-interface Album {
-    nombre: string;
-    fotos: string[];
-}
-
-interface UserData {
-    activo: number;
-    contrasena: string;
-    foto: string;
-    id: number;
-    nombre_completo: string;
-    usuario: string;
-}
 
 function EditAlbum() {
     const { user } = useParams();
-    const [imgSrc, setImgSrc] = useState('');
     const [listAlbums, setListAlbums] = useState<string[]>([]);
     const [selectedAlbum, setSelectedAlbum] = useState('');
-    const [userData, setUserData] = useState<UserData | null>(null);
-    const [indiceAlbum, setIndiceAlbum] = useState<number | null>(null)
 
     const [albumNew, setAlbumNew] = useState({
         usuario: user,
@@ -32,8 +17,8 @@ function EditAlbum() {
 
     const [albumEdit, setAlbumEdit] = useState({
         usuario: user,
-        id_album: '',
-        nombre_album_nuevo: '',
+        nombre_album_actual: '',
+        nombre_album: '',
     });
 
     const [albumDelete, setAlbumDelete] = useState({
@@ -41,6 +26,11 @@ function EditAlbum() {
         nombre_album: '',
     });
 
+    const navigate = useNavigate();
+    const goHome = () =>{
+        navigate(`/homeuserloggedin/${user}`)
+        console.log('estoy dentro')
+    }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -48,20 +38,24 @@ function EditAlbum() {
             ...prevState,
             [name]: value,
         }));
+
+        setAlbumEdit(prevState => ({
+            ...prevState,
+            [name]: value,
+        }));
     };
 
 
-    const handleAlbumSelect = (albumName: string, index: number) => {
+    const handleAlbumSelect = (albumName: string) => {
         setAlbumDelete(prevState => ({
             ...prevState,
             nombre_album: albumName,
         }));
-        setIndiceAlbum(index);
+        setSelectedAlbum(albumName)
     };
 
 
     const handleAddAlbum = async () => {
-        console.log(albumNew.nombre_album)
         try {
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/newalbum`, {
                 method: 'POST', // o 'PUT' si estás actualizando datos
@@ -73,7 +67,9 @@ function EditAlbum() {
             if (response.ok) {
                 const jsonResponse = await response.json();
                 console.log('Respuesta del servidor:', jsonResponse);
-                // Procesa la respuesta aquí (por ejemplo, mostrar un mensaje de éxito)
+                // Procesa la respuesta aquí (por ejemplo, mostrar un mensaje de éxito)\
+                alert('album agregado con exito')
+                goHome();
             } else {
                 // Maneja la respuesta de error del servidor
                 console.error('Error en la respuesta del servidor');
@@ -86,13 +82,14 @@ function EditAlbum() {
     const handleChangeAlbum = async () => {
         const albumEditComplet = {
             ...albumEdit,
-            id_album: indiceAlbum,
-            nombre_album: selectedAlbum,
+            nombre_album_actual: selectedAlbum,
         };
-        if (albumEditComplet.id_album !== null) {
+        console.log(albumEditComplet.nombre_album_actual);
+        console.log(albumEditComplet.nombre_album)
+        if (albumEditComplet.nombre_album_actual !== null) {
             try {
                 const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/editalbum`, {
-                    method: 'POST', // o 'PUT' si estás actualizando datos
+                    method: 'PUT', // o 'PUT' si estás actualizando datos
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -102,6 +99,8 @@ function EditAlbum() {
                     const jsonResponse = await response.json();
                     console.log('Respuesta del servidor:', jsonResponse);
                     // Procesa la respuesta aquí (por ejemplo, mostrar un mensaje de éxito)
+                    alert('Nombre de album editado');
+                    window.location.href = `/homeuserloggedin/${user}`;
                 } else {
                     // Maneja la respuesta de error del servidor
                     console.error('Error en la respuesta del servidor');
@@ -114,13 +113,12 @@ function EditAlbum() {
         }
     };
 
-
     const handleDeleteAlbum = async () => {
         console.log(albumDelete.nombre_album)
         if (albumDelete.nombre_album !== '') {
             try {
                 const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/deletealbum`, {
-                    method: 'POST', // o 'PUT' si estás actualizando datos
+                    method: 'DELETE', 
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -130,6 +128,7 @@ function EditAlbum() {
                     const jsonResponse = await response.json();
                     console.log('Respuesta del servidor:', jsonResponse);
                     alert(jsonResponse.mensaje)
+                    window.location.href = `/homeuserloggedin/${user}`; 
                 } else {
                     // Maneja la respuesta de error del servidor
                     console.error('Error en la respuesta del servidor');
@@ -147,18 +146,16 @@ function EditAlbum() {
     }, []);
 
     const enviarGet = () => {
-        fetch(`${import.meta.env.VITE_BACKEND_URL}/getalbumes/${user}`)
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/getalbumname/${user}`)
             .then(response => {
                 if (response.ok) {
                     return response.json();
                 }
                 throw new Error('Network response was not ok.');
             })
-            .then((data: { albumes: Album[] })=> {
+            .then((data: { albumes: string[] })=> {
                 if (Array.isArray(data.albumes)) {
-                    // Utiliza la interfaz Album para tipar los objetos dentro del arreglo
-                    const nombresAlbumes: string[] = data.albumes.map(album => album.nombre);
-                    setListAlbums(nombresAlbumes);
+                    setListAlbums(data.albumes);
                 } else {
                     throw new Error('La respuesta de la API no tiene el formato esperado.');
                 }
@@ -181,7 +178,7 @@ function EditAlbum() {
                 <div className="col-6">
                     <div className={styles['card-left']}>
                         <div className={styles['card-img']}>
-                            {imgSrc && <img src={imgSrc} alt='photo' className={styles.photo} />}
+                            
                         </div>
                         <Link to={`/homeuserloggedin/${user}`}>
                             <button className='btn btn-outline-primary mb-4'>
@@ -223,7 +220,7 @@ function EditAlbum() {
                                     <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         {listAlbums && listAlbums.map((album, index) => (
                                             <li key={index}>
-                                                <a className="dropdown-item" href="#" onClick={() => handleAlbumSelect(album, index)}>{album}</a>
+                                                <a className="dropdown-item" href="#" onClick={() => handleAlbumSelect(album)}>{album}</a>
                                             </li>
                                         ))}
                                     </ul>

@@ -9,6 +9,7 @@ import UploadPhoto from "./views/UploadPhoto/UploadPhoto";
 import EditAlbum from "./views/EditAlbum/EditAlbum";
 import SeePhotos from "./views/SeePhotos/SeePhotos";
 import TextPhoto from "./views/TextPhoto/TextPhoto";
+import Translate from "./views/Translate/Transalte";
 
 function Layout() {
   return (
@@ -32,6 +33,7 @@ function App() {
         <Route path="/editalbum/:user" element={<EditAlbum/>}/>
         <Route path="/seephotos/:user" element={<SeePhotos/>}/>
         <Route path="/textphoto/:user" element={<TextPhoto/>}/>
+        <Route path="/translate/:user" element={<Translate/>}/>
         <Route element={<Layout />}>
           <Route path='/' element={<Home />} />
         </Route>

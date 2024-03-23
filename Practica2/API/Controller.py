@@ -353,3 +353,34 @@ class Controller:
         except Exception as e:
             print(e)
             return {"mensaje": "Error"}, 500
+
+    def translatePhoto(self,usuario,album,image,idioma):
+        try:
+            if idioma == "Frances": idioma="fr"
+            elif idioma == "Aleman": idioma="de"
+            elif idioma == "Italiano": idioma="it"
+            else: return {"mensaje": "Error"}, 500
+            #obtener el texto a traducir
+            QueryDescription = f'''
+                SELECT IMAGE.descriptionn
+                FROM practica2.IMAGE 
+                INNER JOIN practica2.ALBUM ON IMAGE.albumId = ALBUM.id 
+                INNER JOIN practica2.USER ON ALBUM.userId = USER.id
+                WHERE USER.user = '{usuario}' AND ALBUM.albumName = '{album}' AND IMAGE.photo = '{image}';
+            '''
+
+            self.cursor.execute(QueryDescription)
+            texto_a_traducir = self.cursor.fetchone()[0]
+
+            # Procesa y traduce el resultado si existe
+            if texto_a_traducir is not None:
+                idioma_origen = 'es'
+                idioma_destino = idioma
+                response = self.traductor.translate_text(Text=texto_a_traducir, SourceLanguageCode=idioma_origen, TargetLanguageCode=idioma_destino)
+                texto_traducido = response['TranslatedText']    
+                return {"texto": texto_traducido}, 200
+            return {"mensaje": "Error"}, 500
+            
+        except Exception as e:
+            print(e)
+            return {"mensaje": "Error"}, 500

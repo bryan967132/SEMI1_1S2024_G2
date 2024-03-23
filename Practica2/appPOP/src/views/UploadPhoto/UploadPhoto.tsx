@@ -64,8 +64,10 @@ function UploadPhoto() {
                 if (response.ok) {
                     const jsonResponse = await response.json();
                     console.log('Respuesta del servidor:', jsonResponse);
+                    alert(jsonResponse.mensaje);
                 } else {
                     console.error('Error en la respuesta del servidor');
+                    alert('Error en la respuesta del servidor');
                 }
             } catch (error) {
                 alert('Error al enviar los datos');

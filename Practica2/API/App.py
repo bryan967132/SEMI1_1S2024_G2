@@ -119,6 +119,39 @@ def uploadphotoo():
     body = request.json
     return ctrlr.uploadphotoo(body["usuario"], body["nombre_foto"], body["descripcion"], body["foto"])
 
+# CARGAR FOTOS TRADUCIR
+@app.route('/translatePhoto', methods=["GET"])
+@cross_origin()
+def translatePhoto():
+    usuario = request.args.get('usuario')
+    album = request.args.get('album')
+    image = request.args.get('image')
+    idioma = request.args.get('idioma')
+
+    usuario = str(usuario).replace('%20', ' ')
+    album = str(album).replace('%20', ' ')
+    image = str(image).replace('%20', ' ')    
+
+    return ctrlr.translatePhoto(usuario, album, image, idioma)
+
+# DESCRIPCIÓN FOTO
+@app.route('/descriptionPhoto', methods=["GET"])
+@cross_origin()
+def descriptionPhoto():
+    usuario = request.args.get('usuario')
+    album = request.args.get('album')
+    image = request.args.get('image')
+
+    usuario = str(usuario).replace('%20', ' ')
+    album = str(album).replace('%20', ' ')
+    image = str(image).replace('%20', ' ')    
+
+    return ctrlr.descriptionPhoto(usuario, album, image)
+
+@app.route('/sendMessage', methods=["POST"])
+@cross_origin()
+def sendMessage():
+    return ctrlr.sendMessage(request.json['mensaje'], request.json['usuario'])
 
 if __name__ == '__main__':
     # os.system('clear')

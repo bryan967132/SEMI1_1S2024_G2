@@ -1,0 +1,37 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+
+.container-seephotos{
+    @extend .d-flex, .justify-content-evenly, .align-items-center;
+    height: 100vh;
+    justify-content: center;
+}
+
+.card-img{
+    @extend .card;
+    width: 20vw;
+    height: 20vw;
+    margin: auto;
+}
+
+.global {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    column-gap: 10px;
+}
+
+.selects {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 10px;
+}
+
+.group {
+    width: 92%;
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+}

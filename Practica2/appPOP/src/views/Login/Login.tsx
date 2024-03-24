@@ -48,7 +48,6 @@ function Login() {
                 },
                 body: JSON.stringify(dataLogin), // Convierte los datos del formulario a JSON
             });
-
             if (response.ok) {
                 const jsonResponse = await response.json();
                 if (jsonResponse.mensaje !== 'Error') {
@@ -64,7 +63,6 @@ function Login() {
             alert('Error al enviar los datos');
         }
     };
-
     const handleWebCam = () => {
         setWebCam(!webCam)
         sendLoginData();
@@ -158,7 +156,6 @@ function Login() {
             }
         }
     };
-
 
     return (
         <div>

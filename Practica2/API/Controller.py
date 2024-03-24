@@ -28,6 +28,18 @@ class Controller:
             aws_secret_access_key=os.getenv('REK_SECRET_KEY'),
             region_name=os.getenv('REK_REGION')
         )
+        self.translate = boto3.client(
+            'translate',
+            region_name = os.getenv('TRANSLATE_REGION'),
+            aws_access_key_id = os.getenv('TRANSLATE_ACCESS_KEY'),
+            aws_secret_access_key = os.getenv('TRANSLATE_SECRET_KEY')
+        )
+        self.lex = boto3.client(
+            'lexv2-runtime',
+            region_name = 'us-east-1',
+            aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID_LEX'),
+            aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY_LEX'),
+        )
 
     def uploadProfileImage(self, carpeta, fotoBase64, nombre_foto):
         nombre_ruta = f'{carpeta}/{nombre_foto}.jpg'
@@ -285,9 +297,8 @@ class Controller:
             query = f'''SELECT count(i.id) AS ultimo_id FROM practica2.IMAGE i INNER JOIN practica2.ALBUM a ON i.albumId = a.id WHERE a.userId = {id} AND a.albumName = 'Foto_de_perfil';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            urlImage = self.uploadProfileImage(
-                'Fotos_Perfil', foto, f'{nuevo_usuario}-foto{int(resultados[0][0]) + 1}')
-            query = f"INSERT INTO practica2.IMAGE(photo, albumId) VALUES('{urlImage}', {usuario[6]});"
+            urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f'{nuevo_usuario}-foto{int(resultados[0][0]) + 1}')
+            query = f"INSERT INTO practica2.IMAGE(photo, descriptionn, albumId) VALUES('{urlImage}', 'Foto de Perfil', {usuario[6]});"
             self.cursor.execute(query)
             self.conexion.commit()
             return {"mensaje": "Información actualizada"}, 200
@@ -499,3 +510,105 @@ class Controller:
         except Exception as e:
             print(e)
             return {"mensaje": "Error"}, 500
+
+    def getLanguage(self, idioma):
+        match idioma.lower():
+            case 'frances':
+                return 'fr'
+            case 'aleman':
+                return 'de'
+            case 'italiano':
+                return 'it'
+            case 'bosnio':
+                return 'bs'
+            case 'turco':
+                return 'tr'
+            case 'sueco':
+                return 'sv'
+            case 'ruso':
+                return 'ru'
+
+    def translatePhoto(self, usuario, album, image, idioma):
+        try:
+            for i in [['á', 'a'], ['é', 'e'], ['í', 'i'], ['ó', 'o'], ['ú', 'u']]:
+                idioma = idioma.replace(i[0], i[1])
+            #obtener el texto a traducir
+            QueryDescription = f'''
+                SELECT IMAGE.descriptionn
+                FROM practica2.IMAGE 
+                INNER JOIN practica2.ALBUM ON IMAGE.albumId = ALBUM.id 
+                INNER JOIN practica2.USER ON ALBUM.userId = USER.id
+                WHERE USER.user = '{usuario}' AND ALBUM.albumName = '{album}' AND IMAGE.photo = '{image}';
+            '''
+
+            self.cursor.execute(QueryDescription)
+            texto_a_traducir = self.cursor.fetchone()[0]
+
+            # Procesa y traduce el resultado si existe
+            if texto_a_traducir is not None:
+                idioma_origen = 'es'
+                idioma_destino = self.getLanguage(idioma)
+                response = self.translate.translate_text(
+                    Text = texto_a_traducir,
+                    SourceLanguageCode = idioma_origen,
+                    TargetLanguageCode = idioma_destino
+                )
+                texto_traducido = response['TranslatedText']
+                return {"texto": texto_traducido, 'original': texto_a_traducir}, 200
+            return {"mensaje": "Error"}, 500
+            
+        except Exception as e:
+            print(e)
+            return {"mensaje": "Error"}, 500
+
+    def descriptionPhoto(self, usuario, album, image):
+        try:
+            QueryDescription = f'''
+                SELECT IMAGE.descriptionn
+                FROM practica2.IMAGE 
+                INNER JOIN practica2.ALBUM ON IMAGE.albumId = ALBUM.id 
+                INNER JOIN practica2.USER ON ALBUM.userId = USER.id
+                WHERE USER.user = '{usuario}' AND ALBUM.albumName = '{album}' AND IMAGE.photo = '{image}';
+            '''
+
+            self.cursor.execute(QueryDescription)
+            texto_a_traducir = self.cursor.fetchone()[0]
+
+            return {"texto": texto_a_traducir}, 200            
+        except Exception as e:
+            print(e)
+            return {"mensaje": "Error"}, 500
+
+    def sendMessage(self, message, usuario):
+        response = self.lex.recognize_text(
+            botId = os.getenv('BOT_ID'),
+            botAliasId = os.getenv('BOT_ALIAS_ID'),
+            localeId = os.getenv('LOCALE_ID'),
+            sessionId = os.getenv('SESSION_ID'),
+            text = message
+        )
+        if 'messages' in response:
+            if response['messages'][0]['content'] == '¿Tu usuario?':
+                response = self.lex.recognize_text(
+                    botId = os.getenv('BOT_ID'),
+                    botAliasId = os.getenv('BOT_ALIAS_ID'),
+                    localeId = os.getenv('LOCALE_ID'),
+                    sessionId = os.getenv('SESSION_ID'),
+                    text = usuario
+                )
+                return response
+            if response['sessionState']['intent']['name'] == 'TranslateDescription' and response['messages'][0]['content'] == '¡Fue un placer haberte ayudado!':
+                slots = response['sessionState']['intent']['slots']
+                user = slots['Usuario']['value']['originalValue']
+                album = slots['Album']['value']['originalValue']
+                photo = slots['Foto']['value']['originalValue']
+                language = slots['Idioma']['value']['originalValue']
+
+                if album == 'foto_de_perfil':
+                    photo = f'Fotos_Perfil/{user}-{photo}'
+                else:
+                    photo = f'Fotos_Publicadas/{photo}'
+
+                translated = self.translatePhoto(user, album, photo, language)
+                response['messages'] = [{'contentType': 'PlainText', 'content': f'Tu traducción:\nOriginal\n{translated[0]["original"]}\n\nTraducido\n{translated[0]["texto"]}'}] + response['messages']
+        return response

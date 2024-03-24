@@ -113,6 +113,16 @@ function HomeUserLoggedIn() {
                             Text Photo
                         </button>
                     </Link>
+                    <Link to={`/translate/${user}`}>
+                        <button className={styles['btn-option']}>
+                            Translate
+                        </button>
+                    </Link>
+                    <Link to={`/chatbot/${user}`}>
+                        <button className={styles['btn-option']}>
+                            ChatBot
+                        </button>
+                    </Link>
                     <button className={styles['btn-close-session']} onClick={handleClose}>
                         Close session
                     </button>

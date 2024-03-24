@@ -27,30 +27,30 @@ function Login() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Para prevenir el comportamiento de envío por defecto del formulario
         try {
-          const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/login`, {
-            method: 'POST', // o 'PUT' si estás actualizando datos
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataLogin), // Convierte los datos del formulario a JSON
-          });
-          
-          if (response.ok) {
-            const jsonResponse = await response.json();
-            console.log('Respuesta del servidor:', jsonResponse);
-            if(jsonResponse.mensaje !== 'Error'){
-                alert('Bienvenido');
-                goHome();
-            }else{
-                alert('Error no existe usuario o verificque usario y contraseña');
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/login`, {
+                method: 'POST', // o 'PUT' si estás actualizando datos
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataLogin), // Convierte los datos del formulario a JSON
+            });
+            
+            if (response.ok) {
+                const jsonResponse = await response.json();
+                console.log('Respuesta del servidor:', jsonResponse);
+                if(jsonResponse.mensaje !== 'Error'){
+                    alert('Bienvenido');
+                    goHome();
+                }else{
+                    alert('Error no existe usuario o verificque usario y contraseña');
+                }
+            } else {
+                console.error('Error en la respuesta del servidor');
             }
-          } else {
-            console.error('Error en la respuesta del servidor');
-          }
         } catch (error) {
-          alert('Error al enviar los datos');
+            alert('Error al enviar los datos');
         }
-      };
+    };
 
     return (
         <div>

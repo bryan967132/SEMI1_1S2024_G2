@@ -1,0 +1,110 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+
+.chatglobal {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chatContainer {
+    display: flex;
+    flex-direction: column;
+    height: 70%;
+    width: 50%;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.welcome {
+    padding: 2%;
+    text-align: center;
+    line-height: 30%;
+    user-select: none;
+    color: #a6a6a6;
+}
+
+.messagesContainer {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.message {
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+}
+
+.me {
+    background-color: #007bff;
+    color: #fff;
+    padding: 1%;
+    width: fit-content;
+    border-radius: 10px;
+    align-self: flex-end;
+}
+
+.bot {
+    background-color: #787878;
+    color: #fff;
+    padding: 1%;
+    width: fit-content;
+    border-radius: 10px;
+}
+
+.inputForm {
+    display: flex;
+    padding: 10px;
+    background-color: #f3f3f3;
+}
+
+.messageInput {
+    flex-grow: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    outline: #f3f3f3;
+}
+
+.sendButton {
+    padding: 8px 16px;
+    margin-left: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sendButton:hover {
+    background-color: #0056b3;
+}
+
+.card-img-album {
+    @extend .card;
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+}
+
+.cardimages {
+    display: flex;
+    flex-direction: row;
+    column-gap: 5px;
+}
+
+.cardimages2 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 5px;
+}
+
+.cardimages3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 5px;
+}

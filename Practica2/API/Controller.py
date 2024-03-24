@@ -4,6 +4,8 @@ import base64
 import boto3
 import requests
 from dotenv import load_dotenv
+from PIL import Image
+import io
 import os
 
 # Carga las variables de entorno desde el archivo .env
@@ -68,7 +70,6 @@ class Controller:
             query = f"SELECT * FROM practica2.USER WHERE user = '{usuario}';"
             self.cursor.execute(query)
             usuario_row = self.cursor.fetchone()
-    
             if usuario_row:
                 # Obtener la foto de perfil del usuario
                 query = f'''
@@ -86,8 +87,45 @@ class Controller:
                     # Imprimir la URL de la foto de perfil (cambiar por el uso real)
                     bucket = os.getenv('S3_BUCKET')
                     img1 = imgFaceId
-                    img2 = f'https://{bucket}.s3.us-east-2.amazonaws.com/{usuario_img[5]}'
-    
+                    response = requests.get(f'https://{bucket}.s3.us-east-2.amazonaws.com/{usuario_img[5]}')
+                    if response.status_code == 200:
+                        img2 = base64.b64encode(response.content).decode('utf-8')
+                        # Decodificar las imágenes en base64
+                        img1_base64 = base64.b64decode(img1)
+                        img2_base64 = base64.b64decode(img2)
+
+                        response1 = self.rekognition.detect_faces(Image={'Bytes': img1_base64})
+                        response2 = self.rekognition.detect_faces(Image={'Bytes': img2_base64})
+
+                        # Verificar si se detectaron caras en ambas imágenes
+                        if not response1['FaceDetails'] or not response2['FaceDetails']:
+                            return {'error': 'No se detectaron caras en una o ambas imágenes'}, 400
+                    
+                        similarity_response = self.rekognition.compare_faces(
+                            SourceImage={'Bytes': img1_base64},
+                            TargetImage={'Bytes': img2_base64},
+                        )
+                        
+                        if similarity_response['FaceMatches']:
+                            similarity = similarity_response['FaceMatches'][0]['Similarity']
+                            if similarity > 80:
+                                usuario = usuario_row
+                                query = f"UPDATE practica2.USER SET practica2.USER.activo = 1 WHERE practica2.USER.id = {usuario[0]};"
+                                self.cursor.execute(query)
+                                self.conexion.commit()
+                                return {
+                                    "mensaje": "Bienvenido",
+                                    "id": usuario[0],
+                                    "user": usuario[1],
+                                    "pass": usuario[2],
+                                    "fullName": usuario[3],
+                                    "activo": usuario[4]
+                                }
+                            else:
+                                return {"mensaje": "Error"}
+                        else:
+                            return {"mensaje": "Error"}
+                        
                     return {"mensaje": "Todo bien"}, 200
                 else:
                     return {"mensaje": "No se encontró el usuario"}, 404
@@ -146,14 +184,80 @@ class Controller:
         self.cursor.execute(query)
         resultados = self.cursor.fetchall()
         usuario = resultados[0]
-        return {
-            "id": usuario[0],
-            "user": usuario[1],
-            "pass": usuario[2],
-            "fullName": usuario[3],
-            "activo": usuario[4],
-            "photo": usuario[5]
-        }, 200
+        bucket = os.getenv('S3_BUCKET')
+        response = requests.get(f'https://{bucket}.s3.us-east-2.amazonaws.com/{usuario[5]}')
+        if response.status_code == 200:
+            imgPerfil = base64.b64encode(response.content).decode('utf-8')
+            imgPerfilBase64 = base64.b64decode(imgPerfil)
+            response2 = self.rekognition.detect_faces(Image={'Bytes': imgPerfilBase64}, Attributes=['ALL'])
+            face_details = response2.get('FaceDetails', [])
+            labels = []
+
+            for face_detail in face_details:
+                if 'Gender' in face_detail:
+                    gender = face_detail['Gender']['Value']
+                    labels.append(f"Genero: {gender}")
+
+                if 'AgeRange' in face_detail:
+                    age_range = face_detail['AgeRange']
+                    label = f"Rango de edad: {age_range['Low']} - {age_range['High']} años"
+                    labels.append(label)
+            
+                if 'Smile' in face_detail:
+                    smile = face_detail['Smile']['Value']
+                    if smile:
+                        label = f'Sonriendo'
+                        labels.append(label)
+
+                if 'Eyeglasses' in face_detail:
+                    eyeglasses = face_detail['Eyeglasses']['Value']
+                    if eyeglasses:
+                        label = f'Anteojos'
+                        labels.append(label)
+                
+                if 'Sunglasses' in face_detail:
+                    sunglasses = face_detail['Sunglasses']['Value']
+                    if sunglasses:
+                        label = f'Lentes de sol'
+                        labels.append(label)
+
+                if 'Beard' in face_detail:
+                    beard = face_detail['Beard']['Value']
+                    if beard:
+                        label = f'Barba'
+                        labels.append(label)
+
+                if 'Mustache' in face_detail:
+                    mustache = face_detail['Mustache']['Value']
+                    if mustache:
+                        label = f'Bigote'
+                        labels.append(label)
+
+                if 'EyesOpen' in face_detail:
+                    eyesopen = face_detail['EyesOpen']['Value']
+                    if eyesopen:
+                        label = f'Ojos abiertos'
+                        labels.append(label)
+
+                if 'MouthOpen' in face_detail:
+                    mouthopen = face_detail['MouthOpen']['Value']
+                    if mouthopen:
+                        label = f'Boca abierta'
+                        labels.append(label)
+
+                if 'Emotions' in face_detail:
+                    emotions = [f"{emotion['Type']}: {emotion['Confidence']:.1f}%" for emotion in face_detail['Emotions']]
+                    labels.extend(emotions)
+                
+            return {
+                "id": usuario[0],
+                "user": usuario[1],
+                "pass": usuario[2],
+                "fullName": usuario[3],
+                "activo": usuario[4],
+                "photo": usuario[5],
+                "img_details":labels
+            }, 200
 
     def edituser(self, id, nuevo_usuario, nombre, _, foto):
         print(id, nuevo_usuario, nombre, foto)

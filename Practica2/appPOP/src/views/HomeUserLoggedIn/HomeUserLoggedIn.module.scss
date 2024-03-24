@@ -32,3 +32,10 @@
     @extend .btn , .btn-outline-danger, .m-3;
     width: 100%;
 }
+
+.details{
+    margin-top: 7vw;
+    width: 100%;
+    height: 5vw;
+    overflow-y: auto;
+}

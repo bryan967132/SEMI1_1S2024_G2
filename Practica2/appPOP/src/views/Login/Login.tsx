@@ -51,7 +51,6 @@ function Login() {
 
             if (response.ok) {
                 const jsonResponse = await response.json();
-                console.log('Respuesta del servidor:', jsonResponse);
                 if (jsonResponse.mensaje !== 'Error') {
                     alert('Bienvenido');
                     goHome();
@@ -79,28 +78,43 @@ function Login() {
 
 
     const capturePhoto = () => {
-        console.log('capturando foto....');
         if (webCam) {
-            let contador = 7;
+            let contador = 5;
             const interval = setInterval(() => {
                 if (contador === 0 && webCam) {
                     clearInterval(interval);
                     if (webcamRef.current !== null) {
-                        const photo = webcamRef.current.getScreenshot();
+                        let photo = webcamRef.current.getScreenshot();
                         if (photo !== null) {
-                            const blob = new Blob([photo], { type: 'image/png' }); // Convertir photo a Blob
-                            const reader = new FileReader();
-                            reader.onload = () => {
-                                const base64String = reader.result as string;
-                                const base64Parts = base64String.split(',');
-                                const base64Image = base64Parts[1];
-                                setLoginFaceId(prevLoginFaceId => ({
-                                    ...prevLoginFaceId,
-                                    imgFaceId: base64Image
-                                }));
+                            // Crear un elemento de imagen en el documento
+                            const img = new Image();
+                            img.src = photo;
+    
+                            // Esperar a que la imagen se cargue
+                            img.onload = () => {
+                                // Crear un lienzo para dibujar la imagen
+                                const canvas = document.createElement('canvas');
+                                canvas.width = img.width;
+                                canvas.height = img.height;
+                                const ctx = canvas.getContext('2d');
+    
+                                // Verificar si el contexto del lienzo es válido
+                                if (ctx !== null) {
+                                    // Dibujar la imagen en el lienzo
+                                    ctx.drawImage(img, 0, 0);
+    
+                                    // Convertir el lienzo a una imagen en formato JPEG
+                                    const jpegDataUrl = canvas.toDataURL('image/jpeg');
+    
+                                    // Actualizar el estado con la imagen en formato JPEG
+                                    setLoginFaceId(prevLoginFaceId => ({
+                                        ...prevLoginFaceId,
+                                        imgFaceId: jpegDataUrl.split(',')[1]
+                                    }));
+                                } else {
+                                    console.log('No se pudo obtener el contexto del lienzo');
+                                }
                             };
-
-                            reader.readAsDataURL(blob); // Leer el Blob convertido
                         } else {
                             console.log('La foto capturada es nula');
                         }
@@ -114,7 +128,8 @@ function Login() {
             }, 1000);
         }
     };
-
+    
+    
 
     const sendLoginData = async () => {
         if (webCam) {
@@ -129,7 +144,12 @@ function Login() {
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('Respuesta del servidor:', data);
+                    if (data.mensaje !== 'Error') {
+                        alert('Bienvenido');
+                        goHome();
+                    } else {
+                        alert('Error no existe usuario o verificque usario y contraseña');
+                    }
                 } else {
                     console.error('Error en la respuesta del servidor');
                 }

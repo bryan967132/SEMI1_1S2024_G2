@@ -14,3 +14,68 @@
     padding: 15px;
     border-radius: 20px 0px 20px 0px;
 }
+
+.login-type{
+    display: flex;
+    align-items: center;
+}
+
+.login-type button{
+    flex-grow: 1;
+    margin: 10px;
+}
+
+.login-face-id {
+    display: block;
+    width: 300px; 
+    height: 300px;
+    z-index: 0;
+}
+
+.webcam{
+    border-radius: 40px;
+}
+
+.login-face-id-hiden {
+    display: none;
+}
+
+.accountant{
+    position: absolute;
+    z-index: 1;
+    top: 60%;
+    left: 50%;
+    color: white;
+    transform: translate(-50%, -50%);
+}
+
+.btn-show {
+    border-radius: 5px;
+    border: 1px solid hsl(206, 90%, 46%, 1);
+    display: block;
+    background-color: white;
+    color: hsl(206, 90%, 46%, 1);
+    box-shadow: none;
+}
+
+.btn-show:hover {
+    background-color: hsl(206, 90%, 46%, 1);
+    color: white;
+}
+
+.btn-hidden {
+    display: none;
+}
+
+.login-text{
+    display: block;
+}
+
+.login-text-hiden{
+    display: none;
+}
+  
+  .webcam {
+    width: 100%;
+    height: 100%; 
+  }

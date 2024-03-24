@@ -1,19 +1,28 @@
 import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styles from './Login.module.scss'
 import logo from '../../assets/img/logo.png'
 import { useNavigate } from 'react-router-dom';
+import Webcam from 'react-webcam';
 
 function Login() {
+    const [webCam, setWebCam] = useState(false)
+    const [accountantPhoto, setAccountantPhoto] = useState(7);
+    const webcamRef = useRef<Webcam | null>(null);
+
     const [dataLogin, setDataLogin] = useState({
         usuario: '',
         contrasena: '',
     });
 
+    const [loginFaceId, setLoginFaceId] = useState({
+        usuario: '',
+        imgFaceId: '',
+    })
+
     const navigate = useNavigate();
-    const goHome = () =>{
+    const goHome = () => {
         navigate(`/homeuserloggedin/${dataLogin.usuario}`)
-        console.log('estoy dentro')
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,35 +31,114 @@ function Login() {
             ...prevState,
             [name]: value,
         }));
-    };
+
+        setLoginFaceId(prevState => ({
+            ...prevState,
+            usuario: value,
+        }));
+    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Para prevenir el comportamiento de envío por defecto del formulario
         try {
-          const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/login`, {
-            method: 'POST', // o 'PUT' si estás actualizando datos
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataLogin), // Convierte los datos del formulario a JSON
-          });
-          
-          if (response.ok) {
-            const jsonResponse = await response.json();
-            console.log('Respuesta del servidor:', jsonResponse);
-            if(jsonResponse.mensaje !== 'Error'){
-                alert('Bienvenido');
-                goHome();
-            }else{
-                alert('Error no existe usuario o verificque usario y contraseña');
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataLogin), // Convierte los datos del formulario a JSON
+            });
+
+            if (response.ok) {
+                const jsonResponse = await response.json();
+                console.log('Respuesta del servidor:', jsonResponse);
+                if (jsonResponse.mensaje !== 'Error') {
+                    alert('Bienvenido');
+                    goHome();
+                } else {
+                    alert('Error no existe usuario o verificque usario y contraseña');
+                }
+            } else {
+                console.error('Error en la respuesta del servidor');
             }
-          } else {
-            console.error('Error en la respuesta del servidor');
-          }
         } catch (error) {
-          alert('Error al enviar los datos');
+            alert('Error al enviar los datos');
         }
-      };
+    };
+
+    const handleWebCam = () => {
+        setWebCam(!webCam)
+        sendLoginData();
+    }
+
+    useEffect(() => {
+        if (webCam) {
+            capturePhoto();
+        }
+    }, [webCam]);
+
+
+    const capturePhoto = () => {
+        console.log('capturando foto....');
+        if (webCam) {
+            let contador = 7;
+            const interval = setInterval(() => {
+                if (contador === 0 && webCam) {
+                    clearInterval(interval);
+                    if (webcamRef.current !== null) {
+                        const photo = webcamRef.current.getScreenshot();
+                        if (photo !== null) {
+                            const blob = new Blob([photo], { type: 'image/png' }); // Convertir photo a Blob
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                const base64String = reader.result as string;
+                                const base64Parts = base64String.split(',');
+                                const base64Image = base64Parts[1];
+                                setLoginFaceId(prevLoginFaceId => ({
+                                    ...prevLoginFaceId,
+                                    imgFaceId: base64Image
+                                }));
+                            };
+
+                            reader.readAsDataURL(blob); // Leer el Blob convertido
+                        } else {
+                            console.log('La foto capturada es nula');
+                        }
+                    } else {
+                        console.log('La referencia a la webcam es null');
+                    }
+                } else {
+                    contador--;
+                    setAccountantPhoto(contador);
+                }
+            }, 1000);
+        }
+    };
+
+
+    const sendLoginData = async () => {
+        if (webCam) {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/loginfaceid`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginFaceId)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Respuesta del servidor:', data);
+                } else {
+                    console.error('Error en la respuesta del servidor');
+                }
+            } catch (error) {
+                console.error('Error al enviar los datos:', error);
+            }
+        }
+    };
+
 
     return (
         <div>
@@ -62,22 +150,36 @@ function Login() {
                             <div className='mb-3'>
                                 <label htmlFor="user-name" className='form-label'>Username</label>
                                 <input type="text" id='user-name' className='form-control'
-                                name='usuario' 
-                                value={dataLogin.usuario}
-                                onChange={handleInputChange}
+                                    name='usuario'
+                                    value={dataLogin.usuario}
+                                    onChange={handleInputChange}
                                 />
                             </div>
-                            <div className="mb-3">
+                            <div className={`${webCam == false ? styles['login-text'] : styles['login-text-hiden']} mb-3`}>
                                 <label htmlFor="password" className='form-label'>Password</label>
                                 <input type="password" id='password' className='form-control'
-                                name='contrasena'
-                                value={dataLogin.contrasena}
-                                onChange={handleInputChange}
+                                    name='contrasena'
+                                    value={dataLogin.contrasena}
+                                    onChange={handleInputChange}
                                 />
                             </div>
-                            <button type='submit' className='btn btn-outline-primary mb-4'>
-                                Login
-                            </button>
+                            {webCam && (
+                                <div className={webCam == true ? styles['login-face-id'] : styles['login-face-id-hiden']}>
+                                    <Webcam className={styles['webcam']} ref={webcamRef} />
+                                    <h1 className={styles['accountant']}>{accountantPhoto}</h1>
+                                </div>
+                            )}
+                            <div className={styles['login-type']}>
+                                <button type='submit' className='btn btn-outline-primary mb-4 p-2'>
+                                    Login
+                                </button>
+                                <button type='button' className={`${webCam ? styles['btn-hidden'] : styles['btn-show']}  btn-outline-primary mb-4 p-2`} onClick={handleWebCam}>
+                                    Face Id
+                                </button>
+                                <button type='button' className={`${webCam ? styles['btn-show'] : styles['btn-hidden']}  btn-outline-primary mb-4 p-2`} onClick={sendLoginData}>
+                                    Take photo
+                                </button>
+                            </div>
                         </form>
                         <div className='card-footer text-center'>
                             No tienes cuenta?

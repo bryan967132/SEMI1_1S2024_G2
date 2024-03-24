@@ -2,11 +2,13 @@ import mysql.connector
 import hashlib
 import base64
 import boto3
+import requests
 from dotenv import load_dotenv
 import os
 
 # Carga las variables de entorno desde el archivo .env
 load_dotenv()
+
 
 class Controller:
     def __init__(self) -> None:
@@ -29,9 +31,9 @@ class Controller:
         nombre_ruta = f'{carpeta}/{nombre_foto}.jpg'
         buffer = base64.b64decode(fotoBase64)
         self.s3.put_object(
-            Bucket = os.getenv('S3_BUCKET'),
-            Key = nombre_ruta,
-            Body = buffer,
+            Bucket=os.getenv('S3_BUCKET'),
+            Key=nombre_ruta,
+            Body=buffer,
             ContentType='image/jpeg'
         )
         return nombre_ruta
@@ -59,6 +61,42 @@ class Controller:
             return {"mensaje": "Usuario o contraseña incorrectos"}, 200
         except:
             return {"mensaje": "Error"}, 500
+
+    def loginfaceid(self, usuario, imgFaceId):
+        try:
+            # Verificar las credenciales del usuario
+            query = f"SELECT * FROM practica2.USER WHERE user = '{usuario}';"
+            self.cursor.execute(query)
+            usuario_row = self.cursor.fetchone()
+    
+            if usuario_row:
+                # Obtener la foto de perfil del usuario
+                query = f'''
+                    SELECT u.*, i.photo 
+                    FROM practica2.USER u 
+                    LEFT JOIN practica2.ALBUM a ON u.id = a.userId 
+                    LEFT JOIN practica2.IMAGE i ON a.id = i.albumId 
+                    WHERE u.user = '{usuario}' AND a.albumName='Foto_de_Perfil' 
+                    ORDER BY i.id DESC LIMIT 1;
+                '''
+                self.cursor.execute(query)
+                usuario_img = self.cursor.fetchone()
+    
+                if usuario_img:
+                    # Imprimir la URL de la foto de perfil (cambiar por el uso real)
+                    bucket = os.getenv('S3_BUCKET')
+                    img1 = imgFaceId
+                    img2 = f'https://{bucket}.s3.us-east-2.amazonaws.com/{usuario_img[5]}'
+    
+                    return {"mensaje": "Todo bien"}, 200
+                else:
+                    return {"mensaje": "No se encontró el usuario"}, 404
+            else:
+                return {"mensaje": "Usuario o contraseña incorrectos"}, 401
+        except Exception as e:
+            print(f"Error: {e}")
+            return {"mensaje": "Error en el servidor"}, 500
+
 
     def logout(self, usuario):
         try:
@@ -89,7 +127,8 @@ class Controller:
                 self.cursor.execute("SELECT LAST_INSERT_ID()")
                 album_id = self.cursor.fetchone()[0]
 
-                urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f"{usuario}-foto1")
+                urlImage = self.uploadProfileImage(
+                    'Fotos_Perfil', foto, f"{usuario}-foto1")
 
                 query_image = f'''INSERT INTO practica2.IMAGE(photo, descriptionn, albumId) VALUES('{urlImage}', 'Foto de Perfil', {album_id});'''
                 self.cursor.execute(query_image)
@@ -142,7 +181,8 @@ class Controller:
             query = f'''SELECT count(i.id) AS ultimo_id FROM practica2.IMAGE i INNER JOIN practica2.ALBUM a ON i.albumId = a.id WHERE a.userId = {id} AND a.albumName = 'Foto_de_perfil';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            urlImage = self.uploadProfileImage('Fotos_Perfil', foto, f'{nuevo_usuario}-foto{int(resultados[0][0]) + 1}')
+            urlImage = self.uploadProfileImage(
+                'Fotos_Perfil', foto, f'{nuevo_usuario}-foto{int(resultados[0][0]) + 1}')
             query = f"INSERT INTO practica2.IMAGE(photo, albumId) VALUES('{urlImage}', {usuario[6]});"
             self.cursor.execute(query)
             self.conexion.commit()
@@ -218,7 +258,8 @@ class Controller:
                         ) AND practica2.ALBUM.albumName = '{nombre_album}';'''
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            urlImage = self.uploadProfileImage('Fotos_Publicadas', foto, nombre_foto)
+            urlImage = self.uploadProfileImage(
+                'Fotos_Publicadas', foto, nombre_foto)
             query = f'''INSERT INTO practica2.IMAGE(photo, descriptionn, albumId) VALUES('{urlImage}', '', {resultados[0][0]});'''
             self.cursor.execute(query)
             self.conexion.commit()
@@ -280,14 +321,15 @@ class Controller:
         except Exception as e:
             print(e)
             return {"mensaje": "Error"}, 500
-        
-    def PhotoText(self,foto):
+
+    def PhotoText(self, foto):
         try:
-            imagen = base64.b64decode(foto)  
+            imagen = base64.b64decode(foto)
             response = self.rekognition.detect_text(
                 Image={'Bytes': imagen}
             )
-            texto_detectado = [text['DetectedText'] for text in response['TextDetections'] if text['Type'] == 'LINE']
+            texto_detectado = [text['DetectedText']
+                               for text in response['TextDetections'] if text['Type'] == 'LINE']
             texto_unido = ' '.join(texto_detectado)
             return {"texto": texto_unido}, 200
         except Exception as e:
@@ -296,14 +338,14 @@ class Controller:
 
     def uploadphotoo(self, usuario, nombre_foto, descripcion, foto):
         try:
-            #obtenr las etiquetas de la imagen
+            # obtenr las etiquetas de la imagen
             imagen = base64.b64decode(foto)
             response = self.rekognition.detect_labels(
                 Image={'Bytes': imagen}
             )
             etiquetas = [label['Name'] for label in response['Labels']]
 
-            #select de los nombre de album que tiene el usuario 
+            # select de los nombre de album que tiene el usuario
             QueryAlbumsName = f'''SELECT albumName
                         FROM practica2.ALBUM
                         WHERE userId = (SELECT id FROM practica2.USER WHERE user = '{usuario}');
@@ -311,11 +353,12 @@ class Controller:
             self.cursor.execute(QueryAlbumsName)
             AlbumsName = self.cursor.fetchall()
             AlbumsName = [album[0] for album in AlbumsName]
-            
-            ## se sube la foto al bucket
-            urlImage = self.uploadProfileImage('Fotos_Publicadas', foto, nombre_foto)
 
-             # Validar si ya existe un álbum con cada etiqueta
+            # se sube la foto al bucket
+            urlImage = self.uploadProfileImage(
+                'Fotos_Publicadas', foto, nombre_foto)
+
+            # Validar si ya existe un álbum con cada etiqueta
             for etiqueta in etiquetas:
                 album_existente = False
                 for name in AlbumsName:
@@ -325,7 +368,7 @@ class Controller:
                                     userId = (SELECT id FROM practica2.USER WHERE user = '{usuario}');'''
                         self.cursor.execute(query_album_id)
                         album_id = self.cursor.fetchone()[0]
-                        
+
                         query_insert_photo = f'''INSERT INTO practica2.IMAGE(photo, descriptionn, albumId) 
                                                 VALUES('{urlImage}', '{descripcion}', {album_id});'''
                         self.cursor.execute(query_insert_photo)
@@ -342,13 +385,12 @@ class Controller:
                                     userId = (SELECT id FROM practica2.USER WHERE user = '{usuario}');'''
                 self.cursor.execute(query_album_id)
                 album_id = self.cursor.fetchone()[0]
-                
+
                 query_insert_photo = f'''INSERT INTO practica2.IMAGE(photo, descriptionn, albumId) 
                                         VALUES('{urlImage}', '{descripcion}', {album_id});'''
                 self.cursor.execute(query_insert_photo)
                 self.conexion.commit()
-            
-            
+
             return {"mensaje": "Fotografía agregada"}, 200
         except Exception as e:
             print(e)

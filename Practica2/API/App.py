@@ -20,6 +20,13 @@ def login():
     body = request.json
     return ctrlr.login(body["usuario"], body["contrasena"])
 
+# LOGINFACEID
+@app.route('/loginfaceid', methods=['POST'])
+@cross_origin()
+def loginfaceid():
+    body = request.json
+    return ctrlr.loginfaceid(body["usuario"], body["imgFaceId"])
+
 # LOGOUT
 @app.route('/logout', methods=['POST'])
 @cross_origin()

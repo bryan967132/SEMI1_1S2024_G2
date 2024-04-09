@@ -1,0 +1,44 @@
+CREATE SCHEMA IF NOT EXISTS proyecto1;
+
+CREATE TABLE IF NOT EXISTS proyecto1.USUARIO (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    usuario VARCHAR(100) NOT NULL,
+    contrasena VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    activo BOOLEAN NOT NULL,
+    foto VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS proyecto1.CATEGORIA (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    categoria VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS proyecto1.RECURSO (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    titulo VARCHAR(50) NOT NULL,
+    descripcion VARCHAR(100) NOT NULL,
+    fecha DATE NOT NULL,
+    imagen VARCHAR(50) NOT NULL,
+    tipo VARCHAR(50) NOT NULL,
+    id_categoria INT NOT NULL,
+    FOREIGN KEY (id_categoria) REFERENCES proyecto1.CATEGORIA(id)
+);
+
+CREATE TABLE IF NOT EXISTS proyecto1.FAVORITO (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    id_usuario INT NOT NULL,
+    id_recurso INT NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES proyecto1.USUARIO(id),
+    FOREIGN KEY (id_recurso) REFERENCES proyecto1.RECURSO(id)
+);
+
+
+
+CREATE TABLE IF NOT EXISTS proyecto1.CALIFICACION (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    punteo INT NOT NULL,
+    comentario VARCHAR(100) NOT NULL,
+    id_recurso INT NOT NULL,
+    FOREIGN KEY (id_recurso) REFERENCES proyecto1.RECURSO(id)
+);

@@ -513,24 +513,49 @@ class Controller:
 
     def subir_recurso(self, titulo,descripcion,imagen,ruta,tipo,categoria):
         try:
-            # se sube la foto al bucket
+            #se sube la foto al bucket
             urlImage = self.uploadProfileImage(
-                'Fotos_Publicadas', imagen, titulo)
-            
-            query_obtener_id_categoria = f"SELECT id FROM proyecto.CATEGORIA WHERE categoria = '{categoria}';"
-            
+               'Fotos_Publicadas', imagen, titulo)
+            query_obtener_id_categoria = f"SELECT id FROM proyecto.CATEGORIA WHERE categoria = '{categoria[0]}';"
             self.cursor.execute(query_obtener_id_categoria)
             id_categoria = self.cursor.fetchone()[0]
-            print(id_categoria)
 
             query_insert_photo = f'''
             INSERT INTO proyecto.RECURSO(titulo, descripcion, fecha, imagen, tipo, ruta ,id_categoria) 
             VALUES ('{titulo}', '{descripcion}', CURRENT_DATE(), '{urlImage}' , '{tipo}' , '{ruta}' , '{id_categoria}');            
-            '''
+            ''' 
             self.cursor.execute(query_insert_photo)
             self.conexion.commit()
             return {"mensaje": "Recurso agregado"}, 200
 
+        except Exception as e:
+            print(e)
+            return {"mensaje": "Error"}, 500
+
+    def mis_favoritos(self, usuario):
+        try:
+            query_favoritos = f'''
+            SELECT recurso.*
+            FROM proyecto.RECURSO recurso
+            INNER JOIN proyecto.FAVORITO favorito ON recurso.id = favorito.id_recurso
+            INNER JOIN proyecto.USUARIO usuario ON favorito.id_usuario = usuario.id
+            WHERE usuario.usuario = '{usuario}';
+            '''
+            self.cursor.execute(query_favoritos)
+            favoritos = self.cursor.fetchall()
+            return {"mensaje": "Obtener favorito con exito","favoritos":favoritos}, 200
+        except Exception as e:
+            print(e)
+            return {"mensaje": "Error"}, 500
+
+    def categoria(self):
+        try:
+            query_categorias = f'''
+            SELECT categoria FROM proyecto.CATEGORIA;
+            '''
+            self.cursor.execute(query_categorias)
+            categoria = self.cursor.fetchall()
+            return {"categoria": categoria}, 200
         except Exception as e:
             print(e)
             return {"mensaje": "Error"}, 500

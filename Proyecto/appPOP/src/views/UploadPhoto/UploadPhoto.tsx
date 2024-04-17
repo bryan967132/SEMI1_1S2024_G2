@@ -1,6 +1,6 @@
 import styles from './UploadPhto.module.scss'
 import { Link } from 'react-router-dom';
-import { useState  } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 function UploadPhoto() {
@@ -8,10 +8,40 @@ function UploadPhoto() {
     const [imgSrc, setImgSrc] = useState('');
     const [formData, setFormData] = useState({
         usuario: user,
-        nombre_foto: '',
+        titulo: '',
         descripcion: '',
-        foto: '',
+        ruta:'',
+        imagen: '',
+        tipo: '',
+        categoria: ''
     });
+
+    const [categorias, setCategorias] = useState([]);
+    useEffect(() => {
+        
+        obtenerCategorias();
+    }, []);
+
+    const obtenerCategorias = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}categorias`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            if (response.ok) {
+                const jsonResponse = await response.json();
+                console.log('Respuesta del servidor:', jsonResponse);
+                setCategorias(jsonResponse.categoria);
+            } else {
+                console.error('Error en la respuesta del servidor');
+                alert('Error en la respuesta del servidor');
+            }
+        } catch (error) {
+            alert('Error al obtener las categorías');
+        }
+    };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -22,7 +52,7 @@ function UploadPhoto() {
                 setImgSrc(reader.result as string);
                 setFormData(prevState => ({
                     ...prevState,
-                    foto: base64String || '',
+                    imagen: base64String || '',
                 }));
             };
             reader.readAsDataURL(file); 
@@ -37,11 +67,10 @@ function UploadPhoto() {
         }));
     };
     
-    const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
+    const handleCategoriaSelect = (categoria: string) => {
         setFormData(prevState => ({
             ...prevState,
-            [name]: value,
+            categoria: categoria,
         }));
     };
 
@@ -52,9 +81,9 @@ function UploadPhoto() {
         };
         console.log(formDataWithFile.usuario)
 
-        if (formDataWithFile.foto !== null) {
+        if (formDataWithFile.imagen !== null) {
             try {
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/uploadphotoo`, {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/subir_recurso`, {
                     method: 'POST', 
                     headers: {
                         'Content-Type': 'application/json',
@@ -65,6 +94,18 @@ function UploadPhoto() {
                     const jsonResponse = await response.json();
                     console.log('Respuesta del servidor:', jsonResponse);
                     alert(jsonResponse.mensaje);
+
+                    // Limpiar el formulario y la imagen seleccionada
+                    setFormData({
+                        usuario: user,
+                        titulo: '',
+                        descripcion: '',
+                        ruta:'',
+                        imagen: '',
+                        tipo: '',
+                        categoria: ''
+                    });
+                    setImgSrc('');
                 } else {
                     console.error('Error en la respuesta del servidor');
                     alert('Error en la respuesta del servidor');
@@ -73,8 +114,15 @@ function UploadPhoto() {
                 alert('Error al enviar los datos');
             }
         } else {
-            alert('Elija una foto')
+            alert('Elija una imagen')
         }
+    };
+
+    const handleTipoSelect = (tipo: string) => {
+        setFormData(prevState => ({
+            ...prevState,
+            tipo: tipo,
+        }));
     };
 
     return (
@@ -93,44 +141,71 @@ function UploadPhoto() {
                             <div className={styles['card-img']}>
                                 {imgSrc && <img src={imgSrc} alt='photo' className={styles.photo} />}
                             </div>
-                            <label htmlFor="imgPhoto" className='btn btn-outline-primary mb-4'> Selecionar foto </label>
-                            <input type="file" id='imgPhoto' className={styles.hiddenInput} accept='.jpg, .jpeg, .png' name='fichero'
-                                onChange={handleFileChange}
-                            />
+                            <label htmlFor="imgPhoto" className='btn btn-outline-primary mb-4'> Selecionar imagen </label>
+                            <input type="file" id='imgPhoto' className={styles.hiddenInput} accept='.jpg, .jpeg, .png' name='fichero' onChange={handleFileChange} />
                         </div>
                     </div>
                     <div className="col-5">
                         <div className='container'>
                             <div className="mb-3">
-                                <label htmlFor="photo-name" className='form-label'>Nombre de la imagen</label>
-                                <input type="text" id='photo-name' className='form-control'
-                                    value={formData.nombre_foto}
-                                    name='nombre_foto'
-                                    onChange={handleInputChange}
-                                    required
-                                />
+                                <label htmlFor="photo-name" className='form-label'>Titulo</label>
+                                <input type="text" id='photo-name' className='form-control' value={formData.titulo} name='titulo' onChange={handleInputChange} required />
                             </div>
                             <div className="mb-4">
-                            <label htmlFor="photo-description" className='form-label'>Descripción</label>
-                            <textarea id='photo-description' className='form-control' 
-                                value={formData.descripcion}
-                                name='descripcion'
-                                onChange={handleTextareaChange}
-                                required
-                                rows={7}
-                                />
+                                <label htmlFor="photo-name" className='form-label'>Descripcion</label>
+                                <input type="text" id='photo-name' className='form-control' value={formData.descripcion} name='descripcion' onChange={handleInputChange} required />
                             </div>
-                        </div>
+                            <div className="mb-5">
+                                <label htmlFor="photo-name" className='form-label'>Link</label>
+                                <input type="text" id='photo-name' className='form-control' value={formData.ruta} name='ruta' onChange={handleInputChange} required />
+                            </div>
+                            <div className="d-flex justify-content-between">
+                                <div className='mb-6' style={{ width: '45%' }}>
+                                    <div className="dropdown">
+                                        <button style={{ width: '100%' }} className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonCategoria" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Categoria
+                                        </button>
+                                        <ul className="dropdown-menu" aria-labelledby="dropdownMenuButtonCategoria">
+                                            {categorias.map((categoria, index) => (
+                                                <li key={index} onClick={() => handleCategoriaSelect(categoria)}>
+                                                    <a className="dropdown-item" href="#">{categoria}</a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div className='mb-6' style={{ width: '45%' }}>
+                                    <div className="dropdown">
+                                        <button style={{ width: '100%' }} className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButtonTipo" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Tipo
+                                        </button>
+                                        <ul className="dropdown-menu" aria-labelledby="dropdownMenuButtonTipo">
+                                            <li onClick={() => handleTipoSelect('Libro')}>
+                                                <a className="dropdown-item" href="#">Libro</a>
+                                            </li>
+                                            <li onClick={() => handleTipoSelect('Revista')}>
+                                                <a className="dropdown-item" href="#">Revista</a>
+                                            </li>
+                                            <li onClick={() => handleTipoSelect('Página web')}>
+                                                <a className="dropdown-item" href="#">Página web</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
                         <div>
-                            <button className='btn btn-outline-primary mx-2'>
-                                Subir Foto
-                            </button>
+                            <div className="mt-4">
+                                <button className='btn btn-outline-primary'>
+                                    Subir Recurso
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
+    </div>
     )
-}
-
-export default UploadPhoto;
+    }
+    
+    export default UploadPhoto;

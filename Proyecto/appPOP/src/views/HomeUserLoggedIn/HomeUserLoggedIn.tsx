@@ -47,7 +47,7 @@ function HomeUserLoggedIn() {
     }, []);
 
     const enviarGet = () => {
-        fetch(`${import.meta.env.VITE_BACKEND_URL}/home/${user}`)
+        fetch(`${import.meta.env.VITE_BACKEND_URL}home/${user}`)
             .then(response => {
                 if (response.ok) {
                     return response.json();

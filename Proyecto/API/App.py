@@ -126,6 +126,18 @@ def subir_recurso():
     body = request.json
     return ctrlr.subir_recurso(body["titulo"], body["descripcion"],  body["imagen"], body["ruta"],body["tipo"],body["categoria"])
 
+# OBTENER FAVORITO
+@app.route('/mis_favoritos/<usuario>', methods=["GET"])
+@cross_origin()
+def mis_favoritos(usuario):
+    usuario = str(usuario).replace('%20', ' ')
+    return ctrlr.mis_favoritos(usuario)
+
+# OBTENER CATEGORIAS
+@app.route('/categorias', methods=["GET"])
+@cross_origin()
+def categoria():
+    return ctrlr.categoria()
 
 # CARGAR FOTOS TRADUCIR
 @app.route('/translatePhoto', methods=["GET"])

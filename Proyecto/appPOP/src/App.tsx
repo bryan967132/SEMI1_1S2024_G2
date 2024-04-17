@@ -8,6 +8,7 @@ import HomeUserLoggedIn from "./views/HomeUserLoggedIn/HomeUserLoggedIn";
 import UploadPhoto from "./views/UploadPhoto/UploadPhoto";
 import EditAlbum from "./views/EditAlbum/EditAlbum";
 import SeePhotos from "./views/SeePhotos/SeePhotos";
+import SeeFavorite from "./views/SeeFavorite/SeeFavorite";
 import TextPhoto from "./views/TextPhoto/TextPhoto";
 import Translate from "./views/Translate/Transalte";
 import ChatBot from "./views/Chat/Chat"
@@ -33,6 +34,7 @@ function App() {
         <Route path="/uploadphoto/:user" element={<UploadPhoto/>}/>
         <Route path="/editalbum/:user" element={<EditAlbum/>}/>
         <Route path="/seephotos/:user" element={<SeePhotos/>}/>
+        <Route path="/seefavorite/:user" element={<SeeFavorite/>}/>
         <Route path="/textphoto/:user" element={<TextPhoto/>}/>
         <Route path="/translate/:user" element={<Translate/>}/>
         <Route path="/chatbot/:user" element={<ChatBot/>}/>

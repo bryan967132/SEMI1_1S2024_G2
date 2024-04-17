@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS proyecto.RECURSO (
     fecha DATE NOT NULL,
     imagen VARCHAR(50) NOT NULL,
     tipo VARCHAR(50) NOT NULL,
+    ruta VARCHAR(50),
     id_categoria INT NOT NULL,
     FOREIGN KEY (id_categoria) REFERENCES proyecto.CATEGORIA(id)
 );

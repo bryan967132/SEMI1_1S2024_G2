@@ -511,6 +511,30 @@ class Controller:
             print(e)
             return {"mensaje": "Error"}, 500
 
+    def subir_recurso(self, titulo,descripcion,imagen,ruta,tipo,categoria):
+        try:
+            # se sube la foto al bucket
+            urlImage = self.uploadProfileImage(
+                'Fotos_Publicadas', imagen, titulo)
+            
+            query_obtener_id_categoria = f"SELECT id FROM proyecto.CATEGORIA WHERE categoria = '{categoria}';"
+            
+            self.cursor.execute(query_obtener_id_categoria)
+            id_categoria = self.cursor.fetchone()[0]
+            print(id_categoria)
+
+            query_insert_photo = f'''
+            INSERT INTO proyecto.RECURSO(titulo, descripcion, fecha, imagen, tipo, ruta ,id_categoria) 
+            VALUES ('{titulo}', '{descripcion}', CURRENT_DATE(), '{urlImage}' , '{tipo}' , '{ruta}' , '{id_categoria}');            
+            '''
+            self.cursor.execute(query_insert_photo)
+            self.conexion.commit()
+            return {"mensaje": "Recurso agregado"}, 200
+
+        except Exception as e:
+            print(e)
+            return {"mensaje": "Error"}, 500
+
     def getLanguage(self, idioma):
         match idioma.lower():
             case 'frances':

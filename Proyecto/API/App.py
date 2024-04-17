@@ -119,6 +119,14 @@ def uploadphotoo():
     body = request.json
     return ctrlr.uploadphotoo(body["usuario"], body["nombre_foto"], body["descripcion"], body["foto"])
 
+# SUBIR RECURSO
+@app.route('/subir_recurso', methods=["POST"])
+@cross_origin()
+def subir_recurso():
+    body = request.json
+    return ctrlr.subir_recurso(body["titulo"], body["descripcion"],  body["imagen"], body["ruta"],body["tipo"],body["categoria"])
+
+
 # CARGAR FOTOS TRADUCIR
 @app.route('/translatePhoto', methods=["GET"])
 @cross_origin()

@@ -19,13 +19,13 @@ function SeeFavorite() {
                 if (response.ok) {
                     return response.json();
                 }
-                throw new Error('Network response was not ok.');
+                throw new Error('Se perdio la conexion');
             })
             .then((data: { favoritos: any[] }) => {
                 setListImg(data.favoritos);
             })
             .catch(error => {
-                console.error('There has been a problem with your fetch operation:', error);
+                console.error('Error', error);
             });
     };
 

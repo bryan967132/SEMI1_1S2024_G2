@@ -97,12 +97,11 @@ const Chat: React.FC = () => {
             <div className={styles.chatContainer}>
                 <div className={styles.messagesContainer}>
                     <div className={styles.welcome}>
-                        <p style={{fontWeight: 'bold', fontSize: '120%'}}>Soy FaunaBot</p>
+                        <p style={{fontWeight: 'bold', fontSize: '120%'}}>Soy EduBot</p>
                         <p style={{fontSize: '100%'}}>¡Espero poder ayudarte con lo que necesites!</p>
                         <p style={{fontSize: '100%'}}>Estas son algunas cosas con las que puedo ayudarte:</p>
-                        <p style={{fontSize: '100%'}}>1. Buscar cierta cantidad de fotos de un album específico.</p>
-                        <p style={{fontSize: '100%'}}>2. Traducir la descripción de una foto.</p>
-                        <p style={{fontSize: '100%'}}>3. Crear albums.</p>
+                        <p style={{fontSize: '100%'}}>1. Mostrar mis favoritos.</p>
+                        <p style={{fontSize: '100%'}}>2. Recomendacion de recursos</p>
                     </div>
                     {messages.map((message) => (
                         <div key={message.id} className={styles.message}>

@@ -637,7 +637,7 @@ class Controller:
             text = message
         )
         if 'messages' in response:
-            if response['messages'][0]['content'] == '¿Tu usuario?':
+            if response['messages'][0]['content'] == '¿De que usuario desea observar los favoritos?':
                 response = self.lex.recognize_text(
                     botId = os.getenv('BOT_ID'),
                     botAliasId = os.getenv('BOT_ALIAS_ID'),
@@ -646,18 +646,5 @@ class Controller:
                     text = usuario
                 )
                 return response
-            if response['sessionState']['intent']['name'] == 'TranslateDescription' and response['messages'][0]['content'] == '¡Fue un placer haberte ayudado!':
-                slots = response['sessionState']['intent']['slots']
-                user = slots['Usuario']['value']['originalValue']
-                album = slots['Album']['value']['originalValue']
-                photo = slots['Foto']['value']['originalValue']
-                language = slots['Idioma']['value']['originalValue']
-
-                if album == 'foto_de_perfil':
-                    photo = f'Fotos_Perfil/{user}-{photo}'
-                else:
-                    photo = f'Fotos_Publicadas/{photo}'
-
-                translated = self.translatePhoto(user, album, photo, language)
-                response['messages'] = [{'contentType': 'PlainText', 'content': f'Tu traducción:\nOriginal\n{translated[0]["original"]}\n\nTraducido\n{translated[0]["texto"]}'}] + response['messages']
+            
         return response

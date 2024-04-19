@@ -100,3 +100,37 @@ INSERT INTO proyecto.FAVORITO (id_usuario, id_recurso) VALUES
 (1, 1), -- Física Universitaria
 (1, 6), -- Física cuántica (Berkeley Physics Course)
 (1, 9); -- El alquimista
+
+-- CALIFICAIONES
+INSERT INTO proyecto.CALIFICACION (punteo, comentario, id_recurso)
+VALUES
+    (4, 'Muy bueno', 1),
+    (5, '¡Fascinante!', 1),
+    (3, 'Interesante', 2),
+    (4, 'Recomendado', 2),
+    (5, 'Maravilloso', 3),
+    (4, 'Gran lectura', 3),
+    (3, 'Buen libro', 4),
+    (4, 'Me gustó', 4),
+    (5, 'Excelente', 5),
+    (4, 'Muy interesante', 5),
+    (3, 'Bueno', 6),
+    (4, 'Divertido', 6),
+    (5, 'Increíble', 7),
+    (4, 'Fantástico', 7),
+    (3, 'Interesante', 8),
+    (4, 'Original', 8),
+    (5, 'Adictivo', 9),
+    (4, 'Engancha desde el principio', 9),
+    (3, 'Recomendado', 10),
+    (4, 'Buen libro', 10),
+    (5, 'Fascinante', 11),
+    (4, 'Intrigante', 11),
+    (3, 'Entretenido', 12),
+    (4, 'Genial', 12),
+    (5, 'Imprescindible', 13),
+    (4, 'Muy recomendado', 13),
+    (3, 'Interesante', 14),
+    (4, 'Bien escrito', 14),
+    (5, 'Increíblemente bueno', 15),
+    (4, 'Excelente trama', 15);

@@ -1,15 +1,6 @@
 COMANDOS QUE SE ME OLVIDAN
 mysql -h proyecto-semi1.c7gm4e482f9t.us-east-2.rds.amazonaws.com -u admin -p
-source nombre_del_entorno/bin/activate
-
-FUNCIONALIDADES
--Agregar recursos (subido por ) (ANGEL)
--Mostrar lista de recursos favoritos (ANGEL)
--Chatbot (ANGEL) (Recibir recomendaciones personalizadas de recursos)
-
-
-endpoints a usar
-Insertar recurso
-Mostrar favoritos
-Chatbot
-
+source venv/bin/activate
+INTERACCIONES
+ver favoritos 
+recomendaciones

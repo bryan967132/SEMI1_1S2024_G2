@@ -100,9 +100,9 @@ function HomeUserLoggedIn() {
                                 Edit profile
                             </button>
                         </Link>
-                        <Link to={`/seephotos/${user}`}>
+                        <Link to={`/seeresources/${user}`}>
                             <button className={styles['btn-option']}>
-                                See photos
+                                See resources
                             </button>
                         </Link>
                         <Link to={`/uploadphoto/${user}`}>

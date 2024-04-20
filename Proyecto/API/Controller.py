@@ -264,8 +264,6 @@ class Controller:
                self.cursor.execute(query)
                cantidadUsuarios = self.cursor.fetchall()
                existeUsuario=cantidadUsuarios[0]
-               print(nuevo_usuario+' '+usuario[1])
-               print(existeUsuario[0])
                if existeUsuario[0] >= 1:
                    return{"mensaje":"Usuario ya existe"}, 200
                else:
@@ -343,24 +341,33 @@ class Controller:
             print(e)
             return {"albumes": []}, 500
 
-    def getalbumesfotos(self, usuario, album):
+    def getresources(self, usuario, categoria):
+        categoriaInt = int(categoria)
         try:
-            query = f'''SELECT id FROM proyecto.USUARIO WHERE proyecto.USUARIO.usuario = '{usuario}';'''
+            query = f"SELECT id FROM proyecto.USUARIO WHERE proyecto.USUARIO.usuario = '{usuario}';"
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            query = f'''SELECT id FROM proyecto.ALBUM WHERE proyecto.ALBUM.userId = {resultados[0][0]} AND proyecto.ALBUM.albumName = '{album}';'''
-            self.cursor.execute(query)
-            resultados = self.cursor.fetchall()
-            query = f'SELECT photo FROM proyecto.IMAGE WHERE proyecto.IMAGE.albumId = {resultados[0][0]}'
-            self.cursor.execute(query)
-            resultados = self.cursor.fetchall()
-            albumes = []
-            for r in resultados:
-                albumes.append(r[0])
-            return {"fotos": albumes}, 200
+            usuario = resultados[0];
+            if usuario[0] != 0:
+                if categoriaInt != 0:
+                    query= f'''SELECT R.titulo, R.imagen
+                    FROM RECURSO AS R 
+                    JOIN CATEGORIA AS C
+                    ON  R.id_categoria = C.id
+                    WHERE C.id = '{categoria}';'''
+                    self.cursor.execute(query)
+                    recursos = self.cursor.fetchall()
+                    return {"recursos": recursos}
+                else:
+                    query = f"SELECT titulo, imagen FROM RECURSO;"
+                    self.cursor.execute(query)
+                    recursos =  self.cursor.fetchall()
+                    return {"recursos": recursos}
+            else:
+                return {"mensaje": "El usuario no existe"}, 500
         except Exception as e:
             print(e)
-            return {"fotos": []}, 500
+            return {"recursos": []}, 500
 
     def uploadphoto(self, usuario, nombre_foto, nombre_album, foto):
         try:

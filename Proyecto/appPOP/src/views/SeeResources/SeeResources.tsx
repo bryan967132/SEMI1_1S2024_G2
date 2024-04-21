@@ -75,7 +75,7 @@ function SeeResources() {
                             <div className="d-flex flex-row">
                                 <div className="dropdown">
                                     <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Albums
+                                        Recursos
                                     </button>
                                     <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                         <li onClick={() => handleGategorySelect('0')}>Todos</li>

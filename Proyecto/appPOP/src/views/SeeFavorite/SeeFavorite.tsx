@@ -14,7 +14,7 @@ function SeeFavorite() {
     }, []);
 
     const enviarGet = () => {
-        fetch(`${import.meta.env.VITE_BACKEND_URL}mis_favoritos/${user}`)
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/mis_favoritos/${user}`)
             .then(response => {
                 if (response.ok) {
                     return response.json();

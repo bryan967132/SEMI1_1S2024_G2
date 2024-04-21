@@ -47,7 +47,7 @@ function HomeUserLoggedIn() {
     }, []);
 
     const enviarGet = () => {
-        fetch(`${import.meta.env.VITE_BACKEND_URL}home/${user}`)
+        fetch(`${import.meta.env.VITE_BACKEND_URL}/home/${user}`)
             .then(response => {
                 if (response.ok) {
                     return response.json();
@@ -105,19 +105,19 @@ function HomeUserLoggedIn() {
                                 See resources
                             </button>
                         </Link>
-                        <Link to={`/uploadphoto/${user}`}>
+                        <Link to={`/seefavorite/${user}`}>
                             <button className={styles['btn-option']}>
-                                Upload photo
+                                See favorites
                             </button>
                         </Link>
                         <Link to={`/editalbum/${user}`}>
                             <button className={styles['btn-option']}>
-                                Edit Albums
+                                Edit albums
                             </button>
                         </Link>
                         <Link to={`/textphoto/${user}`}>
                             <button className={styles['btn-option']}>
-                                Text Photo
+                                Text photo
                             </button>
                         </Link>
                         <Link to={`/translate/${user}`}>

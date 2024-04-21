@@ -173,6 +173,21 @@ def descriptionPhoto():
 def sendMessage():
     return ctrlr.sendMessage(request.json['mensaje'], request.json['usuario'])
 
+@app.route('/recurso/<id_usuario>/<id_recurso>', methods=["GET"])
+@cross_origin()
+def recurso(id_usuario, id_recurso):
+    return ctrlr.recurso(id_usuario, id_recurso)
+
+@app.route('/favorite', methods=["POST"])
+@cross_origin()
+def favorite():
+    return ctrlr.favorite(request.json['id_usuario'], request.json['id_recurso'])
+
+@app.route('/comentar', methods=["POST"])
+@cross_origin()
+def comentar():
+    return ctrlr.comentar(request.json['id_recurso'], request.json['punteo'], request.json['comentario'])
+
 if __name__ == '__main__':
     # os.system('clear')
     app.run(host='0.0.0.0', debug = True, port = 4000)

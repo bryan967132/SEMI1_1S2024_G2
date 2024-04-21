@@ -97,9 +97,9 @@ function SeeResources() {
                 </div>
                 <div className={styles['album']}>
                     {listImg && listImg.map((resource, index) => (
-                        <Link to={`resource/${resource[0].replace(" ", "_")}`}>
+                        <Link to={`seeresource/${resource[0]}/${resource[1].replace(" ", "_")}`}>
                             <div className={styles['card-img-album']} key={index}>
-                                <img src={`${import.meta.env.VITE_S3_URL}/` + resource[1]} alt="" className={styles['card-img-album']} />
+                                <img src={`${import.meta.env.VITE_S3_URL}/` + resource[2]} alt="" className={styles['card-img-album']} />
                             </div>
                         </Link>
                     ))}

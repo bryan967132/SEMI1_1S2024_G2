@@ -9,6 +9,7 @@ import UploadPhoto from "./views/UploadPhoto/UploadPhoto";
 import EditAlbum from "./views/EditAlbum/EditAlbum";
 import SeeFavorite from "./views/SeeFavorite/SeeFavorite";
 import SeeResources from "./views/SeeResources/SeeResources";
+import SeeResource from "./views/SeeResource/SeeResource";
 import TextPhoto from "./views/TextPhoto/TextPhoto";
 import Translate from "./views/Translate/Transalte";
 import ChatBot from "./views/Chat/Chat"
@@ -34,7 +35,8 @@ function App() {
         <Route path="/uploadphoto/:user" element={<UploadPhoto/>}/>
         <Route path="/editalbum/:user" element={<EditAlbum/>}/>
         <Route path="/seefavorite/:user" element={<SeeFavorite/>}/>
-        <Route path="/seeresources/:user" element={<SeeResources/>}/>
+        <Route path="/seeresources/:user/:iduser" element={<SeeResources/>}/>
+        <Route path="/seeresources/:user/:iduser/seeresource/:idbook/:namebook" element={<SeeResource/>}/>
         <Route path="/textphoto/:user" element={<TextPhoto/>}/>
         <Route path="/translate/:user" element={<Translate/>}/>
         <Route path="/chatbot/:user" element={<ChatBot/>}/>

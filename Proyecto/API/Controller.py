@@ -350,7 +350,7 @@ class Controller:
             usuario = resultados[0];
             if usuario[0] != 0:
                 if categoriaInt != 0:
-                    query= f'''SELECT R.titulo, R.imagen
+                    query= f'''SELECT R.id, R.titulo, R.imagen
                     FROM RECURSO AS R 
                     JOIN CATEGORIA AS C
                     ON  R.id_categoria = C.id
@@ -359,7 +359,7 @@ class Controller:
                     recursos = self.cursor.fetchall()
                     return {"recursos": recursos}
                 else:
-                    query = f"SELECT titulo, imagen FROM RECURSO;"
+                    query = f"SELECT id, titulo, imagen FROM RECURSO;"
                     self.cursor.execute(query)
                     recursos =  self.cursor.fetchall()
                     return {"recursos": recursos}

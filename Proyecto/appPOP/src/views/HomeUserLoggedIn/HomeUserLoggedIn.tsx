@@ -100,7 +100,7 @@ function HomeUserLoggedIn() {
                                 Edit profile
                             </button>
                         </Link>
-                        <Link to={`/seeresources/${user}`}>
+                        <Link to={`/seeresources/${user}/${userData.id}`}>
                             <button className={styles['btn-option']}>
                                 See resources
                             </button>

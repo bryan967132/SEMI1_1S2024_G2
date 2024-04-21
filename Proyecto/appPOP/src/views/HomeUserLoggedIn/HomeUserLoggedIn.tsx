@@ -73,7 +73,7 @@ function HomeUserLoggedIn() {
                     <div className="col-4">
                         <div className={styles['card-left']}>
                             <div className={styles['card-img']}>
-                                <img src={`${import.meta.env.VITE_S3_URL}` + userData?.photo || ''} alt="" />
+                                <img src={`${import.meta.env.VITE_S3_URL}/` + userData?.photo || ''} alt="" />
                             </div>
                         </div>
                         <div className={styles['details']}>
@@ -100,9 +100,9 @@ function HomeUserLoggedIn() {
                                 Edit profile
                             </button>
                         </Link>
-                        <Link to={`/seephotos/${user}`}>
+                        <Link to={`/seeresources/${user}`}>
                             <button className={styles['btn-option']}>
-                                See photos
+                                See resources
                             </button>
                         </Link>
                         <Link to={`/uploadphoto/${user}`}>

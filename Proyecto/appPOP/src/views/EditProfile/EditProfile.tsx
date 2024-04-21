@@ -63,8 +63,13 @@ function EditProfile() {
                 if (response.ok) {
                     const jsonResponse = await response.json();
                     console.log('Respuesta del servidor:', jsonResponse);
-                    alert("Perfil editado")
-                    goHome();
+                    if (jsonResponse.mensaje==='Usuario ya existe'){
+                        alert(jsonResponse.mensaje)
+                    }else if (jsonResponse.mensaje==='Error')
+                        alert(jsonResponse.mensaje)
+                    else{
+                        goHome();
+                    }
                 } else {
                     // Maneja la respuesta de error del servidor
                     console.error('Error en la respuesta del servidor');
@@ -118,9 +123,9 @@ function EditProfile() {
                     <div className="col-6">
                         <div className={styles['card-left']}>
                             <div className={styles['card-img']}>
-                                {imgSrc && <img src={`${import.meta.env.VITE_S3_URL}`+imgSrc} alt='photo' 
-                                className={changeImg===false? styles.photo:styles.photohiden} />}
-                                {imgSrc && <img src={imgSrc} alt='photo' className={styles.photo} />}
+                                {imgSrc && <img src={`${import.meta.env.VITE_S3_URL}/`+imgSrc} alt='photo' 
+                                className={changeImg===false? styles.photo : styles.photohiden} />}
+                                {imgSrc && <img src={imgSrc} alt='photo' className={changeImg === false? styles.photohiden : styles.photo} />}
                             </div>
                             <label htmlFor="imgPhoto" className='btn btn-outline-primary mb-4'>New photo</label>
                             <input type="file" id='imgPhoto' className={styles.hiddenInput} accept='.jpg, .jpeg, .png' name='fichero'

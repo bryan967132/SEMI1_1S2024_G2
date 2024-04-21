@@ -69,13 +69,13 @@ def getalbumes(usuario):
     usuario = str(usuario).replace('%20', ' ')
     return ctrlr.getalbumes(usuario)
 
-# VER FOTOS POR ALBUM
-@app.route('/getalbumesfotos/<usuario>/<album>', methods=["GET"])
+# VER RECURSOS
+@app.route('/getresources/<usuario>/<categoria>', methods=["GET"])
 @cross_origin()
-def getalbumesfotos(usuario, album):
+def getresources(usuario, categoria):
     usuario = str(usuario).replace('%20', ' ')
-    album = str(album).replace('%20', ' ')
-    return ctrlr.getalbumesfotos(usuario, album)
+    categoria = str(categoria).replace('%20', ' ')
+    return ctrlr.getresources(usuario, categoria)
 
 # CARGAR FOTOS
 @app.route('/uploadphoto', methods=["POST"])

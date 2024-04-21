@@ -177,7 +177,6 @@ class Controller:
         self.cursor.execute(query)
         resultados = self.cursor.fetchall()
         usuario = resultados[0]
-        print(usuario)
         bucket = os.getenv('S3_BUCKET')
         response = requests.get(f'https://{bucket}.s3.us-east-2.amazonaws.com/{usuario[5]}')
         if response.status_code == 200:
@@ -347,10 +346,10 @@ class Controller:
             query = f"SELECT id FROM proyecto.USUARIO WHERE proyecto.USUARIO.usuario = '{usuario}';"
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
-            usuario = resultados[0];
+            usuario = resultados[0]
             if usuario[0] != 0:
                 if categoriaInt != 0:
-                    query= f'''SELECT R.titulo, R.imagen
+                    query= f'''SELECT R.titulo, R.imagen, R.id
                     FROM RECURSO AS R 
                     JOIN CATEGORIA AS C
                     ON  R.id_categoria = C.id
@@ -359,7 +358,7 @@ class Controller:
                     recursos = self.cursor.fetchall()
                     return {"recursos": recursos}
                 else:
-                    query = f"SELECT titulo, imagen FROM RECURSO;"
+                    query = f"SELECT titulo, imagen, id FROM RECURSO;"
                     self.cursor.execute(query)
                     recursos =  self.cursor.fetchall()
                     return {"recursos": recursos}
@@ -653,3 +652,84 @@ class Controller:
                 return response
             
         return response
+
+    def getRecurso(self, id_recurso):
+        query = f'''SELECT id, titulo, descripcion, imagen FROM proyecto.RECURSO WHERE id = {id_recurso}'''
+        self.cursor.execute(query)
+        return self.cursor.fetchone()
+
+    def getFavorito(self, id_usuario, id_recurso):
+        query = f'''SELECT 1 FROM proyecto.FAVORITO WHERE id_usuario = {id_usuario} AND id_recurso = {id_recurso};'''
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
+    def getComentarios(self, id_recurso):
+        query = f'''SELECT u.usuario, c.punteo, c.comentario
+                    FROM proyecto.CALIFICACION c
+                    INNER JOIN proyecto.RECURSO r ON r.id = c.id_recurso
+                    INNER JOIN proyecto.FAVORITO f ON f.id_recurso = r.id
+                    INNER JOIN proyecto.USUARIO u ON u.id = f.id_usuario
+                    WHERE c.id_recurso = {id_recurso};'''
+        self.cursor.execute(query)
+        comentarios = self.cursor.fetchall()
+        for i in range(len(comentarios)):
+            comentario = comentarios[i]
+            comentarios[i] = {
+                "usuario": comentario[0],
+                "punteo": comentario[1],
+                "comentario": comentario[2]
+            }
+        return comentarios
+
+    def recurso(self, id_usuario, id_recurso):
+        try:
+            recurso = self.getRecurso(id_recurso)
+            like = self.getFavorito(id_usuario, id_recurso)
+            comentarios = self.getComentarios(id_recurso)
+            return {
+                "id": recurso[0],
+                "titulo": recurso[1],
+                "descripcion": recurso[2],
+                "imagen": recurso[3],
+                "like": len(like),
+                "comentarios": comentarios
+            }
+        except Exception as e:
+            print(e)
+            return {"mensaje": "Error"}
+
+    def favorite(self, id_usuario, id_recurso):
+        try:
+            query = f'''SELECT 1 FROM proyecto.FAVORITO WHERE id_usuario = {id_usuario} AND id_recurso = {id_recurso};'''
+            self.cursor.execute(query)
+            favorito = self.cursor.fetchall()
+            like = 0
+            estado = ""
+            if len(favorito) == 0:
+                query = f'''INSERT INTO proyecto.FAVORITO(id_usuario, id_recurso) VALUES ({id_usuario}, {id_recurso});'''
+                self.cursor.execute(query)
+                like = 1
+                estado = "Agrega"
+            else:
+                query = f'''DELETE FROM proyecto.FAVORITO WHERE id_usuario = {id_usuario} AND id_recurso = {id_recurso};'''
+                self.cursor.execute(query)
+                like = 0
+                estado = "Quita"
+            self.conexion.commit()
+            return {"mensaje": "exitoso", "like": like, "estado": estado}
+        except Exception as e:
+            print(e)
+            return {"mensaje": "Error"}
+
+    def comentar(self, id_recurso, punteo, comentario):
+        try:
+            query = f'''INSERT INTO proyecto.CALIFICACION(punteo, comentario, id_recurso) VALUES ({punteo}, "{comentario}", {id_recurso});'''
+            self.cursor.execute(query)
+            self.conexion.commit()
+            comentarios = self.getComentarios(id_recurso)
+            return {
+                "comentarios": comentarios
+            }
+        except Exception as e:
+            print(e)
+            return {"mensaje": "Error"}

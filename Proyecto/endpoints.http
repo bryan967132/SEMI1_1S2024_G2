@@ -1,0 +1,59 @@
+Validar Like y Comentarios
+GET: /recurso/<id_usuario>/<id_recurso>
+Request
+Response
+{
+	"id": 1,
+	"titulo": "Mi Recurso",
+	"descripcion": "La descripcion",
+	"imagen": "ruta",
+	"like": true,
+	"comentarios": [
+		{
+			"usuario": "usuario",
+			"punteo": 5,
+			"comentario": "mi comentario"
+		},
+		{
+			"usuario": "usuario",
+			"punteo": 4,
+			"comentario": "mi comentario"
+		}
+	]
+}
+
+Enviar Like
+POST: /favorite
+Request
+{
+	"id_recurso": 1,
+	"id_usuario": 1
+}
+Response
+{
+	"mensaje": "exitoso"
+}
+
+Comentar/Calificar
+POST: /comentar
+Request
+{
+	"punteo": 5,
+	"comentario": "mi comentario",
+	"id_recurso": 1
+}
+Response
+{
+	"comentarios": [
+		{
+			"usuario": "usuario",
+			"punteo": 5,
+			"comentario": "mi comentario"
+		},
+		{
+			"usuario": "usuario",
+			"punteo": 4,
+			"comentario": "mi comentario"
+		}
+	]
+}

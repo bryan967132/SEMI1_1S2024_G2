@@ -1,6 +1,0 @@
-COMANDOS QUE SE ME OLVIDAN
-mysql -h proyecto-semi1.c7gm4e482f9t.us-east-2.rds.amazonaws.com -u admin -p
-source venv/bin/activate
-INTERACCIONES
-ver favoritos 
-recomendaciones

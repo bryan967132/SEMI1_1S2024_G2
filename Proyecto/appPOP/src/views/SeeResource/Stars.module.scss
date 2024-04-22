@@ -1,0 +1,16 @@
+.calificacion{
+    scale: 100%;
+}
+.lista-estrellas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+}
+.estrella-amarilla{
+    width: 1vw;
+}
+.estrella-gris{
+    width: 1vw;
+    height: 1.001vw;
+}

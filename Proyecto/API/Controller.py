@@ -655,12 +655,12 @@ class Controller:
         return response
 
     def getRecurso(self, id_recurso):
-        query = f'''SELECT id, titulo, descripcion, imagen FROM proyecto.RECURSO WHERE id = {id_recurso}'''
+        query = f'''SELECT id, titulo, descripcion, imagen, ruta FROM proyecto.RECURSO WHERE id = {id_recurso}'''
         self.cursor.execute(query)
         return self.cursor.fetchone()
 
     def getFavorito(self, id_usuario, id_recurso):
-        query = f'''SELECT 1 FROM proyecto.FAVORITO WHERE id_usuario = {id_usuario} AND id_recurso = {id_recurso};'''
+        query = f'''SELECT * FROM proyecto.FAVORITO WHERE id_usuario = {id_usuario} AND id_recurso = {id_recurso};'''
         self.cursor.execute(query)
         return self.cursor.fetchall()
 
@@ -668,9 +668,8 @@ class Controller:
         query = f'''SELECT u.usuario, c.punteo, c.comentario
                     FROM proyecto.CALIFICACION c
                     INNER JOIN proyecto.RECURSO r ON r.id = c.id_recurso
-                    INNER JOIN proyecto.FAVORITO f ON f.id_recurso = r.id
-                    INNER JOIN proyecto.USUARIO u ON u.id = f.id_usuario
-                    WHERE c.id_recurso = {id_recurso};'''
+                    INNER JOIN proyecto.USUARIO u ON u.id = c.id_usuario
+                    WHERE r.id = {id_recurso};'''
         self.cursor.execute(query)
         comentarios = self.cursor.fetchall()
         for i in range(len(comentarios)):
@@ -685,14 +684,15 @@ class Controller:
     def recurso(self, id_usuario, id_recurso):
         try:
             recurso = self.getRecurso(id_recurso)
-            like = self.getFavorito(id_usuario, id_recurso)
+            favorito = self.getFavorito(id_usuario, id_recurso)
             comentarios = self.getComentarios(id_recurso)
             return {
                 "id": recurso[0],
                 "titulo": recurso[1],
                 "descripcion": recurso[2],
                 "imagen": recurso[3],
-                "like": len(like),
+                "ruta": recurso[4],
+                "like": favorito[0][3] if len(favorito) > 0 else 0,
                 "comentarios": comentarios
             }
         except Exception as e:
@@ -701,30 +701,25 @@ class Controller:
 
     def favorite(self, id_usuario, id_recurso):
         try:
-            query = f'''SELECT 1 FROM proyecto.FAVORITO WHERE id_usuario = {id_usuario} AND id_recurso = {id_recurso};'''
-            self.cursor.execute(query)
-            favorito = self.cursor.fetchall()
+            favorito = self.getFavorito(id_usuario, id_recurso)
             like = 0
-            estado = ""
             if len(favorito) == 0:
-                query = f'''INSERT INTO proyecto.FAVORITO(id_usuario, id_recurso) VALUES ({id_usuario}, {id_recurso});'''
+                query = f'''INSERT INTO proyecto.FAVORITO(id_usuario, id_recurso, activo) VALUES ({id_usuario}, {id_recurso}, 1);'''
                 self.cursor.execute(query)
                 like = 1
-                estado = "Agrega"
             else:
-                query = f'''DELETE FROM proyecto.FAVORITO WHERE id_usuario = {id_usuario} AND id_recurso = {id_recurso};'''
+                like = 1 if favorito[0][3] == 0 else 0
+                query = f'''UPDATE proyecto.FAVORITO SET activo = {like} WHERE id_usuario = {id_usuario} AND id_recurso = {id_recurso};'''
                 self.cursor.execute(query)
-                like = 0
-                estado = "Quita"
             self.conexion.commit()
-            return {"mensaje": "exitoso", "like": like, "estado": estado}
+            return {"mensaje": "exitoso", "like": like}
         except Exception as e:
             print(e)
             return {"mensaje": "Error"}
 
-    def comentar(self, id_recurso, punteo, comentario):
+    def comentar(self, id_recurso, id_usuario, punteo, comentario):
         try:
-            query = f'''INSERT INTO proyecto.CALIFICACION(punteo, comentario, id_recurso) VALUES ({punteo}, "{comentario}", {id_recurso});'''
+            query = f'''INSERT INTO proyecto.CALIFICACION(punteo, comentario, id_recurso, id_usuario) VALUES ({punteo}, "{comentario}", {id_recurso}, {id_usuario});'''
             self.cursor.execute(query)
             self.conexion.commit()
             comentarios = self.getComentarios(id_recurso)

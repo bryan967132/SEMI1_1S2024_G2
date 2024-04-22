@@ -186,7 +186,7 @@ def favorite():
 @app.route('/comentar', methods=["POST"])
 @cross_origin()
 def comentar():
-    return ctrlr.comentar(request.json['id_recurso'], request.json['punteo'], request.json['comentario'])
+    return ctrlr.comentar(request.json['id_recurso'], request.json['id_usuario'], request.json['punteo'], request.json['comentario'])
 
 if __name__ == '__main__':
     # os.system('clear')

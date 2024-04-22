@@ -6,14 +6,16 @@ import likeClick from '../../../src/assets/icons/corazon-lleno-rojo.svg'
 import starEmptyYellow from '../../../src/assets/icons/estrella-vacia-amarilla.svg';
 import starFilledYellow from '../../../src/assets/icons/estrella-lleno-amarilla.svg';
 import starEmptyGrey from '../../../src/assets/icons/estrella-vacia-gris.svg';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Stars from './Stars'
 
 interface resourceData {
     id: number;
     titulo: string;
     descripcion: string;
     imagen: string;
-    like: boolean;
+    ruta: string;
+    like: number;
     comentarios: {
         usuario: string;
         punteo: number;
@@ -23,18 +25,34 @@ interface resourceData {
 
 function SeeResource() {
     const { user, iduser, idbook } = useParams();
-    const [rating, setRating] = useState(0);
-    const [likeResource, setLikeResource] = useState(0);
-    const [starSend, setStartSend] = useState(0);
-    const [comment,setComment] = useState('');
-    const [resourceData, setResourceData] = useState<resourceData | null>(null);
+    const [ rating, setRating ] = useState(0);
+    const [ likeResource, setLikeResource ] = useState(0);
+    const [ starSend, setStartSend ] = useState(0);
+    const [ comment, setComment ] = useState('');
+    const [ resourceData, setResourceData ] = useState<resourceData | null>(null);
+    const [ comentarios, setComentarios ] = useState<{
+        usuario: string;
+        punteo: number;
+        comentario: string;
+    }[]>([])
+
+    const getResource = async () => {
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/recurso/${iduser}/${idbook}`)
+            const data = await response.json()
+            setLikeResource(data.like)
+            setComentarios(data.comentarios)
+            setResourceData(data)
+        } catch(error) {
+            alert('Error al obtener los datos');
+        }
+    }
+
+    useEffect(() => {
+        getResource()
+    }, [])
 
     const changeStateLike = async () => {
-        if (likeResource == 0) {
-            setLikeResource(1);
-        } else {
-            setLikeResource(0);
-        }
         try {
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/favorite`, {
                 method: 'POST',
@@ -48,11 +66,9 @@ function SeeResource() {
             });
             if (response.ok) {
                 const jsonResponse = await response.json();
-                console.log('Respuesta del servidor:', jsonResponse);
-                alert(jsonResponse.mensaje)
+                setLikeResource(jsonResponse.like)
             } else {
-                // Maneja la respuesta de error del servidor
-                console.error('Error en la respuesta del servidor');
+                alert('Error al recibir los datos');
             }
         } catch (error) {
             alert('Error al enviar los datos');
@@ -69,18 +85,17 @@ function SeeResource() {
                 body: JSON.stringify({
                     "punteo": starSend,
                     "comentario": comment,
-                    "id_recurso":idbook,
+                    "id_recurso": idbook,
                     "id_usuario": iduser
                 }),
             });
             if (response.ok) {
                 const jsonResponse = await response.json();
-                console.log('Respuesta del servidor:', jsonResponse);
-                alert(jsonResponse.mensaje)
+                setComentarios(jsonResponse.comentarios)
             } else {
-                // Maneja la respuesta de error del servidor
-                console.error('Error en la respuesta del servidor');
+                alert('Error al recibir los datos');
             }
+            setComment('')
         } catch (error) {
             alert('Error al enviar los datos');
         }
@@ -98,10 +113,6 @@ function SeeResource() {
         setStartSend(rating)
     }
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setComment(e.target.value);
-    }
-
     return (
         <div className='container'>
             <div className={styles['container-see-resource']}>
@@ -114,126 +125,70 @@ function SeeResource() {
                 </div>
                 <div className='col-5 justify-content-center m-5'>
                     <div className={styles['card-img-book']}>
-                        <img src='' alt="" className={styles['img-book']} />
+                        <img src={`${import.meta.env.VITE_S3_URL}/${resourceData?.imagen}`} alt="" className={styles['img-book']} />
                     </div>
                     <div className='card-body'>
                         <div className={styles['titlle-like']}>
-                            <h3 className='card-title'>hola mundo</h3>
+                            <h3 className='card-title'>{resourceData?.titulo}</h3>
                             {likeResource == 1 ? (
                                 <img src={likeClick} alt="" id={styles['like']} onClick={changeStateLike} />
                             ) : (
                                 <img src={like} alt="" id={styles['like']} onClick={changeStateLike} />
                             )}
                         </div>
-                        <p className='card-text'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Vitae dolores perferendis molestiae voluptate beatae, iure maiores necessitatibus sapiente omnis similique, veniam doloribus sed alias aliquam deserunt atque accusantium sequi facilis!</p>
-                        <a href="">Link de sitio</a>
+                        <p className='card-text'>{resourceData?.descripcion}</p>
+                        <a href={resourceData?.ruta}>Link de sitio</a>
                     </div>
                 </div>
-                <div className='col-1'></div>
                 <div className='col-5 justify-content-center m-5'>
-                    {likeResource === 1 && (
-                        <div>
-                            <h2>Comentarios</h2>
-                            <div className={styles['caja-comentarios']}>
-                                <div className='comentario'>
-                                    <h4>user namer</h4>
-                                    <div className='calificadas'>
-                                        5 estrellas
+                    <div>
+                        <h2 className={styles['titulo-comentarios']}>Comentarios</h2>
+                        <div className={styles['caja-comentarios']}>
+                            {comentarios.map((comentario, index) => (
+                                <div key={index} className={user !== comentario.usuario ? styles['flex-comentario'] : styles['flex-mi-comentario']}>
+                                    <div className={styles['comentario']}>
+                                        <span className={styles['user-comment']}>{user !== comentario.usuario ? comentario.usuario : 'Tú'}</span>
+                                        <Stars punteo={comentario.punteo}/>
+                                        {comentario.comentario}
                                     </div>
-                                    <span> comentario </span>
-                                    <hr />
+                                    <hr/>
                                 </div>
-                                <div className='comentario'>
-                                    <h4>user namer</h4>
-                                    <div className='calificadas'>
-                                        5 estrellas
-                                    </div>
-                                    <span> comentario </span>
-                                    <hr />
-                                </div>
-                                <div className='comentario'>
-                                    <h4>user namer</h4>
-                                    <div className='calificadas'>
-                                        5 estrellas
-                                    </div>
-                                    <span> comentario </span>
-                                    <hr />
-                                </div>
-                                <div className='comentario'>
-                                    <h4>user namer</h4>
-                                    <div className='calificadas'>
-                                        5 estrellas
-                                    </div>
-                                    <span> comentario </span>
-                                    <hr />
-                                </div>
-                                <div className='comentario'>
-                                    <h4>user namer</h4>
-                                    <div className='calificadas'>
-                                        5 estrellas
-                                    </div>
-                                    <span> comentario </span>
-                                    <hr />
-                                </div>
-                                <div className='comentario'>
-                                    <h4>user namer</h4>
-                                    <div className='calificadas'>
-                                        5 estrellas
-                                    </div>
-                                    <span> comentario </span>
-                                    <hr />
-                                </div>
-                                <div className='comentario'>
-                                    <h4>user namer</h4>
-                                    <div className='calificadas'>
-                                        5 estrellas
-                                    </div>
-                                    <span> comentario </span>
-                                    <hr />
-                                </div>
-                                <div className='comentario'>
-                                    <h4>user namer</h4>
-                                    <div className='calificadas'>
-                                        5 estrellas
-                                    </div>
-                                    <span> comentario </span>
-                                    <hr />
-                                </div>
-
-                            </div>
-                            <div className={styles['calificacion']}>
-                                <ul className={styles['lista-estrellas']} onMouseLeave={resetRating}>
-                                    {[1, 2, 3, 4, 5].map((valor) => (
-                                        <li key={valor} onClick={() => handleSendRating(valor)} onMouseEnter={() => handleRatingChange(valor)}>
-                                            {starSend != 0 ? (
-                                                <img
-                                                    src={valor <= starSend ? starFilledYellow : starEmptyGrey}
-                                                    alt=""
-                                                    className={styles['estrella']}
-                                                />
-                                            ) : (
-                                                <img
-                                                    src={valor <= rating ? starEmptyYellow : starEmptyGrey}
-                                                    alt=""
-                                                    className={styles['estrella']}
-                                                />
-                                            )}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                            <div className=''>
-                                <textarea name="" id={styles['caja-comentario']} 
-                                    value={comment}
-                                    onChange={handleInputChange}
-                                    >
-                                </textarea>
-                                <button className={styles['btn-post']} onClick={sendComment}>
-                                    Publicar
-                                </button>
-                            </div>
+                            ))}
                         </div>
-                    )}
+                        <div className={styles['calificacion']}>
+                            <ul className={styles['lista-estrellas']} onMouseLeave={resetRating}>
+                                {[1, 2, 3, 4, 5].map((valor) => (
+                                    <li key={valor} onClick={() => handleSendRating(valor)} onMouseEnter={() => handleRatingChange(valor)}>
+                                        {starSend != 0 ? (
+                                            <img
+                                                src={valor <= starSend ? starFilledYellow : starEmptyGrey}
+                                                alt=""
+                                                className={styles['estrella-amarilla']}
+                                            />
+                                        ) : (
+                                            <img
+                                                src={valor <= rating ? starEmptyYellow : starEmptyGrey}
+                                                alt=""
+                                                className={styles['estrella-gris']}
+                                            />
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className={styles.inputForm}>
+                            <input
+                                type="text"
+                                placeholder="Type a message..."
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                className={styles.messageInput}
+                            />
+                            <button className={styles['sendButton']} onClick={sendComment}>
+                                Publicar
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

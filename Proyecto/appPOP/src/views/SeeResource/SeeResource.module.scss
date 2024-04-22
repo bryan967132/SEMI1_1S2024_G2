@@ -35,9 +35,49 @@
 }
 
 .caja-comentarios {
+    position: relative;
     width: 100%;
     height: 25vw;
-    overflow-y: scroll;
+    padding: 1rem;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.flex-comentario {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.flex-mi-comentario {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.comentario {
+    position: relative;
+    margin: 0;
+    padding: 0.5rem 1.5rem 0.7rem 1.5rem;
+    background: #EBEFF3;
+    color: #000;
+    width: fit-content;
+    max-width: 75%;
+    border-radius: 0.5rem;
+    line-height: normal;
+}
+
+.user-comment {
+    width: 100%;
+    color: #37589A;
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.titulo-comentarios {
+    color: #37589A;
 }
 
 .lista-estrellas {
@@ -47,8 +87,14 @@
     display: flex;
 }
 
-.estrella{
+.estrella-amarilla{
     width: 3vw; 
+    cursor: pointer;
+    padding: 0 5px;
+}
+
+.estrella-gris{
+    width: 3vw;
     cursor: pointer;
     padding: 0 5px;
 }
@@ -65,4 +111,32 @@
 
 .btn-post {
     @extend .btn, .btn-outline-primary, .m-3;
+}
+
+.inputForm {
+    display: flex;
+    padding: 10px;
+    background-color: #f3f3f3;
+}
+
+.messageInput {
+    flex-grow: 1;
+    border: none;
+    border-radius: 4px;
+    outline: #f3f3f3;
+}
+
+.sendButton {
+    padding: 8px 16px;
+    margin-left: 8px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.sendButton:hover {
+    background-color: #0056b3;
 }

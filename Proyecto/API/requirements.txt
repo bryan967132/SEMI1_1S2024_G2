@@ -1,0 +1,6 @@
+Flask
+Flask-CORS
+boto3
+mysql-connector-python
+python-dotenv
+requests

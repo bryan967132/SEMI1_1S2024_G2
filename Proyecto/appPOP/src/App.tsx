@@ -11,7 +11,6 @@ import SeeFavorite from "./views/SeeFavorite/SeeFavorite";
 import SeeResources from "./views/SeeResources/SeeResources";
 import SeeResource from "./views/SeeResource/SeeResource";
 import TextPhoto from "./views/TextPhoto/TextPhoto";
-import Translate from "./views/Translate/Transalte";
 import ChatBot from "./views/Chat/Chat"
 
 function Layout() {
@@ -38,7 +37,6 @@ function App() {
         <Route path="/seeresources/:user/:iduser" element={<SeeResources/>}/>
         <Route path="/seeresources/:user/:iduser/seeresource/:idbook/:namebook" element={<SeeResource/>}/>
         <Route path="/textphoto/:user" element={<TextPhoto/>}/>
-        <Route path="/translate/:user" element={<Translate/>}/>
         <Route path="/chatbot/:user" element={<ChatBot/>}/>
         <Route element={<Layout />}>
           <Route path='/' element={<Home />} />

@@ -4,8 +4,6 @@ import base64
 import boto3
 import requests
 from dotenv import load_dotenv
-from PIL import Image
-import io
 import os
 
 # Carga las variables de entorno desde el archivo .env
@@ -173,7 +171,7 @@ class Controller:
         return {"mensaje": "Intente con un nuevo nombre de usuario"}, 500
 
     def home(self, usuario):
-        query = f'''SELECT * From USUARIO WHERE usuario = '{usuario}' '''
+        query = f'''SELECT * From proyecto.USUARIO WHERE usuario = '{usuario}' '''
         self.cursor.execute(query)
         resultados = self.cursor.fetchall()
         usuario = resultados[0]
@@ -254,12 +252,12 @@ class Controller:
 
     def edituser(self, id, nuevo_usuario, nombre, _, foto):
         try:
-            query = f"SELECT * FROM USUARIO WHERE id = '{id}';"
+            query = f"SELECT * FROM proyecto.USUARIO WHERE id = '{id}';"
             self.cursor.execute(query)
             resultados = self.cursor.fetchall()
             usuario = resultados[0]
             if usuario[1] != nuevo_usuario:
-               query = f"SELECT COUNT(usuario) FROM USUARIO WHERE usuario = '{nuevo_usuario}';"
+               query = f"SELECT COUNT(usuario) FROM proyecto.USUARIO WHERE usuario = '{nuevo_usuario}';"
                self.cursor.execute(query)
                cantidadUsuarios = self.cursor.fetchall()
                existeUsuario=cantidadUsuarios[0]
@@ -272,19 +270,19 @@ class Controller:
                                             CopySource = {'Bucket':os.getenv('S3_BUCKET'),
                                                           'Key':usuario[5]},
                                             Key=urlImage)
-                        query = f"UPDATE USUARIO SET usuario = '{nuevo_usuario}',nombre = '{nombre}', foto = '{urlImage}' WHERE id = '{id}'"
+                        query = f"UPDATE proyecto.USUARIO SET usuario = '{nuevo_usuario}',nombre = '{nombre}', foto = '{urlImage}' WHERE id = '{id}'"
                         self.cursor.execute(query)
                         self.conexion.commit()
                     else:
                         self.deleteProfileImage(usuario[5])
                         urlImage = self.uploadProfileImage(
                         'Fotos_Perfil', foto, f"{nuevo_usuario}-foto1")
-                        query = f"UPDATE USUARIO SET usuario = '{nuevo_usuario}',nombre = '{nombre}', foto = '{urlImage}' WHERE id = '{id}'"
+                        query = f"UPDATE proyecto.USUARIO SET usuario = '{nuevo_usuario}',nombre = '{nombre}', foto = '{urlImage}' WHERE id = '{id}'"
                         self.cursor.execute(query)
                         self.conexion.commit()
             else:
                 if foto == usuario[5]:
-                    query = f"UPDATE USUARIO SET nombre = '{nombre}' WHERE id = '{id}'"
+                    query = f"UPDATE proyecto.USUARIO SET nombre = '{nombre}' WHERE id = '{id}'"
                     self.cursor.execute(query)
                     self.conexion.commit()
                 else:
@@ -292,7 +290,7 @@ class Controller:
                     urlImage = self.uploadProfileImage(
                     'Fotos_Perfil', foto, f"{usuario[1]}-foto1")
 
-                    query = f"UPDATE USUARIO SET nombre = '{nombre}', foto = '{urlImage}' WHERE id = '{id}'"
+                    query = f"UPDATE proyecto.USUARIO SET nombre = '{nombre}', foto = '{urlImage}' WHERE id = '{id}'"
                     self.cursor.execute(query)
                     self.conexion.commit()
 
@@ -409,15 +407,15 @@ class Controller:
 
     def editalbum(self, usuario, nombre_album_actual, nombre_album_nuevo):
         try:
-            query = f"SELECT id FROM USUARIO WHERE fullName = '{usuario}'"
+            query = f"SELECT id FROM proyecto.USUARIO WHERE fullName = '{usuario}'"
             self.cursor.execute(query)
             resultado = self.cursor.fetchall()
             id_usuario = resultado[0][0]
-            query = f'SELECT id FROM ALBUM WHERE albumName = {nombre_album_actual} AND userId = {id_usuario}'
+            query = f'SELECT id FROM proyecto.ALBUM WHERE albumName = {nombre_album_actual} AND userId = {id_usuario}'
             self.cursor.execute(query)
             resultado = self.cursor.fetchall()
             id_album = resultado[0][0]
-            query = f'''UPDATE ALBUM SET albumName = '{nombre_album_nuevo}' WHERE userId = {id_usuario} AND id = {id_album};'''
+            query = f'''UPDATE proyecto.ALBUM SET albumName = '{nombre_album_nuevo}' WHERE userId = {id_usuario} AND id = {id_album};'''
             self.cursor.execute(query)
             self.conexion.commit()
             return {"mensaje": "Album actualizado"}, 200
@@ -426,15 +424,15 @@ class Controller:
 
     def deletealbum(self, usuario, nombre_album):
         try:
-            query = f'''SELECT id FROM ALBUM WHERE albumName = '{nombre_album}';'''
+            query = f'''SELECT id FROM proyecto.ALBUM WHERE albumName = '{nombre_album}';'''
             self.cursor.execute(query)
             id_album = self.cursor.fetchall()[0][0]
-            query = f'''SELECT id FROM USUARIO WHERE usuario = '{usuario}';'''
+            query = f'''SELECT id FROM proyecto.USUARIO WHERE usuario = '{usuario}';'''
             self.cursor.execute(query)
             id_usuario = self.cursor.fetchall()[0][0]
-            query = f'''DELETE FROM IMAGE WHERE albumId = {id_album};'''
+            query = f'''DELETE FROM proyecto.IMAGE WHERE albumId = {id_album};'''
             self.cursor.execute(query)
-            query = f'''DELETE FROM ALBUM WHERE id = {id_album} AND userId = {id_usuario};'''
+            query = f'''DELETE FROM proyecto.ALBUM WHERE id = {id_album} AND userId = {id_usuario};'''
             self.cursor.execute(query)
             self.conexion.commit()
             return {"mensaje": "Album eliminado"}, 200

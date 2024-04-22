@@ -120,11 +120,6 @@ function HomeUserLoggedIn() {
                                 Edit albums
                             </button>
                         </Link>
-                        <Link to={`/translate/${user}`}>
-                            <button className={styles['btn-option']}>
-                                Translate
-                            </button>
-                        </Link>
                         <Link to={`/chatbot/${user}`}>
                             <button className={styles['btn-option']}>
                                 ChatBot

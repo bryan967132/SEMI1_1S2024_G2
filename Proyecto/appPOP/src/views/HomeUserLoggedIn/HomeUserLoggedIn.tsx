@@ -110,14 +110,14 @@ function HomeUserLoggedIn() {
                                 See favorites
                             </button>
                         </Link>
+                        <Link to={`/uploadphoto/${user}`}>
+                            <button className={styles['btn-option']}>
+                                Upload resources
+                            </button>
+                        </Link>
                         <Link to={`/editalbum/${user}`}>
                             <button className={styles['btn-option']}>
                                 Edit albums
-                            </button>
-                        </Link>
-                        <Link to={`/textphoto/${user}`}>
-                            <button className={styles['btn-option']}>
-                                Text photo
                             </button>
                         </Link>
                         <Link to={`/translate/${user}`}>

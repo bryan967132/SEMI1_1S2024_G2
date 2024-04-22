@@ -24,7 +24,7 @@ function UploadPhoto() {
 
     const obtenerCategorias = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}categorias`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/categorias`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

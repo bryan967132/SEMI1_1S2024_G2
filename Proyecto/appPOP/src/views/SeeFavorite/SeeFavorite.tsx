@@ -54,7 +54,7 @@ function SeeFavorite() {
                     <div className={styles['card-left']}>
                         {selectedImg && (
                             <div className={styles['selected-img']}>
-                                <img src={`${import.meta.env.VITE_S3_URL}${selectedImg[4]}`} alt="" className={styles['selected-img']} />
+                                <img src={`${import.meta.env.VITE_S3_URL}/${selectedImg[4]}`} alt="" className={styles['selected-img']} />
                             </div>
                         )}
                         <div>
@@ -66,7 +66,7 @@ function SeeFavorite() {
                     {listImg && listImg.map((img, index) => (
                         <div className={styles['card-img-album']} key={index}>
                             <img 
-                                src={`${import.meta.env.VITE_S3_URL}${img[4]}`} 
+                                src={`${import.meta.env.VITE_S3_URL}/${img[4]}`} 
                                 alt="" 
                                 className={styles['card-img-album']}
                                 onClick={() => handleImageClick(img)}
